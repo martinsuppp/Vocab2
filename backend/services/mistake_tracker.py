@@ -24,6 +24,34 @@ class MistakeTracker:
             }
         return stats
 
+    def get_all_stats(self):
+        """Fetch stats for all words in the database."""
+        conn = get_db_connection()
+        rows = conn.execute("SELECT * FROM word_stats").fetchall()
+        conn.close()
+
+        stats = []
+        for row in rows:
+            total = row['correct_count'] + row['mistake_count']
+            ratio = 0
+            if total > 0:
+                ratio = round(row['correct_count'] / total * 100, 1)
+            
+            stats.append({
+                'word': row['word'],
+                'correct_count': row['correct_count'],
+                'mistake_count': row['mistake_count'],
+                'ratio': ratio
+            })
+        return stats
+
+    def reset_stats(self):
+        """Clear all statistics from the database."""
+        conn = get_db_connection()
+        conn.execute("DELETE FROM word_stats")
+        conn.commit()
+        conn.close()
+
     def record_result(self, word, is_correct):
         """Update stats for a single word."""
         conn = get_db_connection()
@@ -69,26 +97,8 @@ class MistakeTracker:
             weights.append(weight)
 
         # Select words
-        # Note: If num_questions > len(all_words), just return all_words shuffled
-        if num_questions >= len(all_words):
-            selected_words = all_words.copy()
-            random.shuffle(selected_words)
-        else:
-            selected_words = random.choices(all_words, weights=weights, k=num_questions)
-            # Ensure uniqueness if possible (random.choices replaces, so we might get duplicates)
-            # Better approach for uniqueness:
-            # Use weights to shuffle a list index, then pick top N?
-             # Simple approach: Loop until we have enough unique words or run out of attempts
-            selected_unique = []
-            seen = set()
-            attempts = 0
-            while len(selected_unique) < num_questions and attempts < 100:
-                choice = random.choices(all_words, weights=weights, k=1)[0]
-                if choice['word'] not in seen:
-                    selected_unique.append(choice)
-                    seen.add(choice['word'])
-                attempts += 1
-            selected_words = selected_unique
+        # Always allow duplicates as per user request ("unlimited appearances")
+        selected_words = random.choices(all_words, weights=weights, k=num_questions)
 
         # Generate questions with options
         exam = []

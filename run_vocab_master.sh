@@ -28,7 +28,7 @@ cd ..
 
 echo "VocabMaster is running!"
 echo "Frontend: http://localhost:5173"
-echo "Backend: http://localhost:5000"
+echo "Backend: http://localhost:5001"
 echo "Press Ctrl+C to stop."
 
 wait

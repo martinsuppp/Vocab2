@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './views/Home';
 import MemoryMode from './views/MemoryMode';
 import ExamMode from './views/ExamMode';
+import Stats from './views/Stats';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/memory" element={<MemoryMode />} />
           <Route path="/exam" element={<ExamMode />} />
+          <Route path="/stats" element={<Stats />} />
         </Routes>
       </div>
     </Router>

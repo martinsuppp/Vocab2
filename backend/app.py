@@ -9,7 +9,9 @@ app = Flask(__name__)
 CORS(app)
 
 # Initialize services
-data_loader = DataLoader('data')
+basedir = os.path.abspath(os.path.dirname(__file__))
+data_path = os.path.join(basedir, 'data')
+data_loader = DataLoader(data_path)
 mistake_tracker = MistakeTracker()
 
 # Ensure DB is initialized
@@ -66,9 +68,33 @@ def submit_result():
     try:
         for result in results:
             mistake_tracker.record_result(result['word'], result['is_correct'])
-        return jsonify({'message': 'Results recorded successfully'})
+            
+        # Fetch updated stats for the words just submitted
+        word_list = [r['word'] for r in results]
+        updated_stats = mistake_tracker.get_stats(word_list)
+        
+        return jsonify({
+            'message': 'Results recorded successfully',
+            'updated_stats': updated_stats
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/stats', methods=['GET'])
+def get_stats():
+    try:
+        stats = mistake_tracker.get_all_stats()
+        return jsonify(stats)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/stats', methods=['DELETE'])
+def reset_stats():
+    try:
+        mistake_tracker.reset_stats()
+        return jsonify({'message': 'Stats reset successfully'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5001)

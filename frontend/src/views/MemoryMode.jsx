@@ -49,6 +49,24 @@ const MemoryMode = () => {
         setIsFlipped(!isFlipped);
     };
 
+    // Keyboard controls
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'ArrowRight') {
+                handleNext(e);
+            } else if (e.key === 'ArrowLeft') {
+                handlePrev(e);
+            } else if (e.key === 'ArrowUp') {
+                handleFlip();
+            } else if (e.key === ' ') { // Optional: Space to flip too
+                handleFlip();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [currentIndex, isFlipped, words.length]); // Dependencies for state access
+
     if (loading) return <div className="flex h-screen items-center justify-center text-white">Loading...</div>;
     if (words.length === 0) return <div className="flex h-screen items-center justify-center text-white">No words found or file error.</div>;
 

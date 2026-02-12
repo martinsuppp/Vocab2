@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getFiles } from '../api';
-import { BookOpen, PenTool, Settings } from 'lucide-react';
+import { BookOpen, PenTool, Settings, BarChart } from 'lucide-react';
 
 const Home = () => {
     const navigate = useNavigate();
@@ -38,7 +38,15 @@ const Home = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen p-4">
+        <div className="flex flex-col items-center justify-center min-h-screen p-4 relative">
+            <div className="absolute top-6 right-6">
+                <button
+                    onClick={() => navigate('/stats')}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors border border-slate-700 text-sm font-medium text-slate-300 hover:text-white"
+                >
+                    <BarChart className="w-4 h-4 text-purple-400" /> Stats
+                </button>
+            </div>
             <h1 className="text-4xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
                 VocabMaster
             </h1>
