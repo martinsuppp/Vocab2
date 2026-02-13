@@ -22,7 +22,7 @@ cd ..
 echo "Starting Frontend (Vite)..."
 cd frontend
 npm install > /dev/null
-npm run dev &
+npm run dev -- --host &
 FRONTEND_PID=$!
 cd ..
 

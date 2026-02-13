@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from database import init_db
 from services.data_loader import DataLoader
@@ -27,13 +27,18 @@ def list_files():
 
 @app.route('/api/words', methods=['GET'])
 def get_words():
-    filename = request.args.get('filename')
-    if not filename:
+    filename_param = request.args.get('filename')
+    if not filename_param:
         return jsonify({'error': 'Filename is required'}), 400
     
     try:
-        words = data_loader.load_words(filename)
-        return jsonify(words)
+        filenames = [f.strip() for f in filename_param.split(',')]
+        all_words = []
+        for fname in filenames:
+            words = data_loader.load_words(fname)
+            all_words.extend(words)
+            
+        return jsonify(all_words)
     except FileNotFoundError:
         return jsonify({'error': 'File not found'}), 404
     except Exception as e:
@@ -42,9 +47,9 @@ def get_words():
 @app.route('/api/exam', methods=['POST'])
 def generate_exam():
     data = request.json
-    filename = data.get('filename')
+    filename_param = data.get('filename')
     
-    if not filename:
+    if not filename_param:
         return jsonify({'error': 'Filename is required'}), 400
         
     try:
@@ -52,7 +57,15 @@ def generate_exam():
         new_ratio = float(data.get('new_ratio', 20)) / 100.0  # Frontend sends 0-100
         mistake_weight = float(data.get('mistake_weight', 5.0))
 
-        all_words = data_loader.load_words(filename)
+        filenames = [f.strip() for f in filename_param.split(',')]
+        all_words = []
+        for fname in filenames:
+            words = data_loader.load_words(fname)
+            all_words.extend(words)
+
+        if not all_words:
+             return jsonify([])
+
         exam = mistake_tracker.generate_exam(all_words, num_questions, new_ratio, mistake_weight)
         return jsonify(exam)
     except FileNotFoundError:
@@ -99,5 +112,35 @@ def reset_stats():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# Serve React App
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve(path):
+    static_folder = os.path.join(basedir, '../frontend/dist')
+    
+    # Debug logging
+    print(f"DEBUG: Current CWD: {os.getcwd()}", flush=True)
+    print(f"DEBUG: Serving path: {path}", flush=True)
+    print(f"DEBUG: Static folder: {static_folder}", flush=True)
+    print(f"DEBUG: Exists? {os.path.exists(static_folder)}", flush=True)
+    
+    # Check parent directory structure
+    try:
+        parent_dir = os.path.join(basedir, '..')
+        print(f"DEBUG: Parent contents: {os.listdir(parent_dir)}", flush=True)
+        frontend_dir = os.path.join(parent_dir, 'frontend')
+        if os.path.exists(frontend_dir):
+            print(f"DEBUG: Frontend contents: {os.listdir(frontend_dir)}", flush=True)
+    except Exception as e:
+        print(f"DEBUG: Error checking dirs: {e}", flush=True)
+
+    if os.path.exists(static_folder):
+        print(f"DEBUG: Dist Contents: {os.listdir(static_folder)}", flush=True)
+    
+    if path != "" and os.path.exists(os.path.join(static_folder, path)):
+        return send_from_directory(static_folder, path)
+    else:
+        return send_from_directory(static_folder, 'index.html')
+
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    app.run(debug=True, port=5001, host='0.0.0.0')

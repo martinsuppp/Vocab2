@@ -7,7 +7,10 @@ import SoundManager from '../utils/SoundManager';
 const Home = () => {
     const navigate = useNavigate();
     const [files, setFiles] = useState([]);
-    const [selectedFile, setSelectedFile] = useState('');
+    const [selectedFiles, setSelectedFiles] = useState(() => {
+        const saved = localStorage.getItem('selectedFiles');
+        return saved ? JSON.parse(saved) : [];
+    });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -15,8 +18,12 @@ const Home = () => {
             try {
                 const fileList = await getFiles();
                 setFiles(fileList);
-                if (fileList.length > 0) {
-                    setSelectedFile(fileList[0]);
+                // Pre-select the first file if available and nothing selected yet (and nothing in storage)
+                if (fileList.length > 0 && selectedFiles.length === 0) {
+                    const saved = localStorage.getItem('selectedFiles');
+                    if (!saved) {
+                        setSelectedFiles([fileList[0]]);
+                    }
                 }
             } catch (error) {
                 console.error("Failed to fetch files:", error);
@@ -27,11 +34,36 @@ const Home = () => {
         fetchFiles();
     }, []);
 
-    const [numQuestions, setNumQuestions] = useState(20); // Changed default from 10 to 20
+    // Persist selected files
+    useEffect(() => {
+        localStorage.setItem('selectedFiles', JSON.stringify(selectedFiles));
+    }, [selectedFiles]);
+
+    const [numQuestions, setNumQuestions] = useState(() => {
+        const saved = localStorage.getItem('numQuestions');
+        return saved ? Number(saved) : 20;
+    });
     const [showSettings, setShowSettings] = useState(false);
-    const [instantFeedback, setInstantFeedback] = useState(false);
-    const [newRatio, setNewRatio] = useState(20); // 20%
-    const [mistakeWeight, setMistakeWeight] = useState(5); // 5x
+    const [instantFeedback, setInstantFeedback] = useState(() => {
+        const saved = localStorage.getItem('instantFeedback');
+        return saved !== null ? saved === 'true' : true; // Default to true
+    });
+    const [newRatio, setNewRatio] = useState(() => {
+        const saved = localStorage.getItem('newRatio');
+        return saved ? Number(saved) : 20;
+    });
+    const [mistakeWeight, setMistakeWeight] = useState(() => {
+        const saved = localStorage.getItem('mistakeWeight');
+        return saved ? Number(saved) : 5;
+    });
+
+    // Persist settings
+    useEffect(() => {
+        localStorage.setItem('numQuestions', numQuestions);
+        localStorage.setItem('instantFeedback', instantFeedback);
+        localStorage.setItem('newRatio', newRatio);
+        localStorage.setItem('mistakeWeight', mistakeWeight);
+    }, [numQuestions, instantFeedback, newRatio, mistakeWeight]);
 
     // Sound State
     const [isMuted, setIsMuted] = useState(SoundManager.muted);
@@ -42,8 +74,14 @@ const Home = () => {
     };
 
     const handleStart = (mode) => {
-        if (!selectedFile) return;
-        let url = `/${mode}?filename=${encodeURIComponent(selectedFile)}`;
+        if (selectedFiles.length === 0) {
+            alert("Please select at least one file!");
+            return;
+        }
+
+        const filenameParam = selectedFiles.join(',');
+        let url = `/${mode}?filename=${encodeURIComponent(filenameParam)}`;
+
         if (mode === 'exam') {
             url += `&numQuestions=${numQuestions}`;
             url += `&instantFeedback=${instantFeedback}`;
@@ -80,26 +118,35 @@ const Home = () => {
 
                 {/* File Selection */}
                 <div className="mb-6">
-                    <label className="block text-sm font-medium text-slate-400 mb-2">Select Word List</label>
+                    <label className="block text-sm font-medium text-slate-400 mb-2">Select Word Lists (Multi-select)</label>
                     {loading ? (
                         <div className="animate-pulse h-10 bg-slate-700 rounded"></div>
                     ) : (
-                        <div className="relative">
-                            <select
-                                value={selectedFile}
-                                onChange={(e) => setSelectedFile(e.target.value)}
-                                className="w-full bg-slate-900 text-slate-100 p-3 rounded-xl border border-slate-700 appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                            >
-                                <option value="">-- Choose a file --</option>
-                                {files.map(file => (
-                                    <option key={file} value={file}>{file}</option>
-                                ))}
-                            </select>
-                            <div className="absolute right-3 top-3.5 pointer-events-none text-slate-500">
-                                ▼
-                            </div>
+                        <div className="bg-slate-900 rounded-xl border border-slate-700 p-3 max-h-40 overflow-y-auto">
+                            {files.length === 0 && <p className="text-slate-500 text-sm">No files found.</p>}
+                            {files.map(file => (
+                                <label key={file} className="flex items-center gap-3 p-2 hover:bg-slate-800 rounded cursor-pointer transition-colors">
+                                    <input
+                                        type="checkbox"
+                                        value={file}
+                                        checked={selectedFiles.includes(file)}
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                setSelectedFiles([...selectedFiles, file]);
+                                            } else {
+                                                setSelectedFiles(selectedFiles.filter(f => f !== file));
+                                            }
+                                        }}
+                                        className="w-4 h-4 rounded border-slate-600 bg-slate-700 text-blue-500 focus:ring-blue-500 focus:ring-offset-slate-900"
+                                    />
+                                    <span className="text-slate-300 text-sm">{file}</span>
+                                </label>
+                            ))}
                         </div>
                     )}
+                    <div className="mt-2 text-xs text-slate-500 text-right">
+                        {selectedFiles.length} file{selectedFiles.length !== 1 ? 's' : ''} selected
+                    </div>
                 </div>
 
                 {/* Exam Settings */}

@@ -9,8 +9,11 @@ npm install
 npm run build
 cd ..
 
-# Install Backend Deps
-echo "Installing Backend Dependencies..."
-cd backend
-pip install -r requirements.txt
-cd ..
+# Install Python Dependencies
+echo "Installing Python Dependencies..."
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+python -m pip install gunicorn
+echo "Installed packages:"
+python -m pip list
+

@@ -24,6 +24,8 @@ if ! gh repo view vocab-master &> /dev/null; then
     gh repo create vocab-master --private --source=. --remote=origin --push
 else
     echo "⚠️  Repo 'vocab-master' already exists. Pushing updates..."
+    git add .
+    git commit -m "feat: Deployment fixes and debug logging"
     git push -u origin main
 fi
 

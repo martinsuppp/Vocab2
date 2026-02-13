@@ -114,7 +114,7 @@ const ExamMode = () => {
 
         const newAnswers = {
             ...userAnswers,
-            [currentQ.word]: {
+            [currentIndex]: { // Key by INDEX to support duplicate words
                 question: currentQ,
                 selected: selectedOption,
                 isCorrect: isCorrect,
@@ -157,13 +157,15 @@ const ExamMode = () => {
         SoundManager.stopBGM();
         SoundManager.playFinish();
 
-        // Calculate score
+        // Calculate score based on questions length to ensure unanswered questions count as wrong
         let correctCount = 0;
-        const results = Object.values(finalAnswers).map(ans => {
-            if (ans.isCorrect) correctCount++;
+        const results = questions.map((q, idx) => {
+            const ans = finalAnswers[idx]; // Lookup by INDEX
+            const isCorrect = ans ? ans.isCorrect : false; // Treat missing answers as mistakes
+            if (isCorrect) correctCount++;
             return {
-                word: ans.question.word,
-                is_correct: ans.isCorrect
+                word: q.word,
+                is_correct: isCorrect
             };
         });
 
@@ -223,7 +225,7 @@ const ExamMode = () => {
                                     </thead>
                                     <tbody className="divide-y divide-slate-700 bg-slate-800/50">
                                         {questions.map((q, idx) => {
-                                            const ans = userAnswers[q.word];
+                                            const ans = userAnswers[idx]; // Lookup by INDEX
                                             const isCorrect = ans?.isCorrect;
                                             const stats = updatedStats[q.word] || {};
 

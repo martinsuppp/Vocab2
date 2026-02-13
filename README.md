@@ -22,6 +22,7 @@ A tool for mastering English vocabulary through flashcards and adaptive quizzes.
     ./run_vocab_master.sh
     ```
 3.  Open [http://localhost:5173](http://localhost:5173) in your browser.
+    *   **To use on your phone**: Ensure your phone is on the same Wi-Fi, find your computer's IP address (e.g., `192.168.1.5`), and visit `http://192.168.1.5:5173`.
 
 ### Deployment / Backup
 To push your latest changes to GitHub (requires GitHub CLI `gh`):
