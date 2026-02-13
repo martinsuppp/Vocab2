@@ -86,30 +86,34 @@ const Stats = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-slate-750 border-b border-slate-700">
-                                <th
-                                    className="p-4 font-semibold text-slate-300 cursor-pointer hover:bg-slate-700 transition-colors select-none"
-                                    onClick={() => handleSort('word')}
-                                >
+                            <tr className="bg-slate-750 border-b border-slate-700 text-xs uppercase tracking-wider text-slate-400">
+                                <th rowSpan="2" className="p-4 text-left font-semibold cursor-pointer hover:bg-slate-700" onClick={() => handleSort('word')}>
                                     <div className="flex items-center gap-2">Word {getSortIcon('word')}</div>
                                 </th>
-                                <th
-                                    className="p-4 font-semibold text-green-400 cursor-pointer hover:bg-slate-700 transition-colors select-none"
-                                    onClick={() => handleSort('correct_count')}
-                                >
-                                    <div className="flex items-center gap-2">Correct {getSortIcon('correct_count')}</div>
+                                <th colSpan="3" className="p-2 text-center border-l border-slate-700 bg-slate-800/50">Lifetime</th>
+                                <th colSpan="3" className="p-2 text-center border-l border-slate-700 bg-blue-900/20 text-blue-300">Last 20</th>
+                            </tr>
+                            <tr className="bg-slate-750 border-b border-slate-700 text-xs">
+                                {/* Lifetime */}
+                                <th className="p-2 text-center border-l border-slate-700 cursor-pointer hover:bg-slate-700" onClick={() => handleSort('correct_count')}>
+                                    Correct {getSortIcon('correct_count')}
                                 </th>
-                                <th
-                                    className="p-4 font-semibold text-red-400 cursor-pointer hover:bg-slate-700 transition-colors select-none"
-                                    onClick={() => handleSort('mistake_count')}
-                                >
-                                    <div className="flex items-center gap-2">Mistakes {getSortIcon('mistake_count')}</div>
+                                <th className="p-2 text-center cursor-pointer hover:bg-slate-700" onClick={() => handleSort('mistake_count')}>
+                                    Mistakes {getSortIcon('mistake_count')}
                                 </th>
-                                <th
-                                    className="p-4 font-semibold text-yellow-400 cursor-pointer hover:bg-slate-700 transition-colors select-none"
-                                    onClick={() => handleSort('ratio')}
-                                >
-                                    <div className="flex items-center gap-2">Ratio (%) {getSortIcon('ratio')}</div>
+                                <th className="p-2 text-center cursor-pointer hover:bg-slate-700" onClick={() => handleSort('ratio')}>
+                                    Ratio {getSortIcon('ratio')}
+                                </th>
+
+                                {/* Recent */}
+                                <th className="p-2 text-center border-l border-slate-700 cursor-pointer hover:bg-slate-700" onClick={() => handleSort('recent_correct')}>
+                                    Correct {getSortIcon('recent_correct')}
+                                </th>
+                                <th className="p-2 text-center cursor-pointer hover:bg-slate-700" onClick={() => handleSort('recent_mistake')}>
+                                    Mistakes {getSortIcon('recent_mistake')}
+                                </th>
+                                <th className="p-2 text-center cursor-pointer hover:bg-slate-700" onClick={() => handleSort('recent_ratio')}>
+                                    Ratio {getSortIcon('recent_ratio')}
                                 </th>
                             </tr>
                         </thead>
@@ -117,15 +121,30 @@ const Stats = () => {
                             {sortedStats.length > 0 ? (
                                 sortedStats.map((item, idx) => (
                                     <tr key={idx} className="border-b border-slate-700/50 hover:bg-slate-700/50 transition-colors">
-                                        <td className="p-4 font-medium text-lg">{item.word}</td>
-                                        <td className="p-4 text-green-300 font-mono">{item.correct_count}</td>
-                                        <td className="p-4 text-red-300 font-mono">{item.mistake_count}</td>
-                                        <td className="p-4 text-yellow-300 font-mono">
+                                        <td className="p-4 font-medium text-lg border-r border-slate-700/50">{item.word}</td>
+
+                                        {/* Lifetime Data */}
+                                        <td className="p-2 text-center text-green-300/70 font-mono">{item.correct_count}</td>
+                                        <td className="p-2 text-center text-red-300/70 font-mono">{item.mistake_count}</td>
+                                        <td className="p-2 text-center text-yellow-300/70 font-mono border-r border-slate-700/50">
                                             {item.ratio}%
-                                            <div className="w-24 h-1.5 bg-slate-700 rounded-full mt-1 overflow-hidden">
+                                            <div className="w-16 h-1 bg-slate-700 rounded-full mx-auto mt-1 overflow-hidden">
                                                 <div
-                                                    className={`h-full ${item.ratio >= 80 ? 'bg-green-500' : item.ratio >= 50 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                                                    className={`h-full ${item.ratio >= 80 ? 'bg-green-500/50' : item.ratio >= 50 ? 'bg-yellow-500/50' : 'bg-red-500/50'}`}
                                                     style={{ width: `${item.ratio}%` }}
+                                                ></div>
+                                            </div>
+                                        </td>
+
+                                        {/* Recent Data */}
+                                        <td className="p-2 text-center text-green-300 font-bold font-mono">{item.recent_correct}</td>
+                                        <td className="p-2 text-center text-red-300 font-bold font-mono">{item.recent_mistake}</td>
+                                        <td className="p-2 text-center text-yellow-300 font-bold font-mono">
+                                            {item.recent_ratio}%
+                                            <div className="w-16 h-1.5 bg-slate-700 rounded-full mx-auto mt-1 overflow-hidden">
+                                                <div
+                                                    className={`h-full ${item.recent_ratio >= 80 ? 'bg-green-500' : item.recent_ratio >= 50 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                                                    style={{ width: `${item.recent_ratio}%` }}
                                                 ></div>
                                             </div>
                                         </td>
@@ -133,7 +152,7 @@ const Stats = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="4" className="p-8 text-center text-slate-500">
+                                    <td colSpan="7" className="p-8 text-center text-slate-500">
                                         No stats available yet. Start practicing!
                                     </td>
                                 </tr>

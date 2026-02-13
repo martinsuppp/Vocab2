@@ -16,8 +16,14 @@ export const getWords = async (filename) => {
     return response.data;
 };
 
-export const generateExam = async (filename, numQuestions) => {
-    const response = await api.post('/exam', { filename, num_questions: numQuestions });
+export const generateExam = async (filename, settings) => {
+    // settings: { numQuestions, newRatio, mistakeWeight }
+    const response = await api.post('/exam', {
+        filename,
+        num_questions: settings.numQuestions,
+        new_ratio: settings.newRatio,
+        mistake_weight: settings.mistakeWeight
+    });
     return response.data;
 };
 

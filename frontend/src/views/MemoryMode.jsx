@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { getWords } from '../api';
 import { ArrowLeft, ArrowRight, RotateCw, Home as HomeIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import SoundManager from '../utils/SoundManager'; // Import SoundManager
 
 const MemoryMode = () => {
     const [searchParams] = useSearchParams();
@@ -31,6 +32,7 @@ const MemoryMode = () => {
 
     const handleNext = (e) => {
         e.stopPropagation();
+        SoundManager.playClick(); // Play click sound
         if (currentIndex < words.length - 1) {
             setIsFlipped(false);
             setTimeout(() => setCurrentIndex(prev => prev + 1), 150);
@@ -39,6 +41,7 @@ const MemoryMode = () => {
 
     const handlePrev = (e) => {
         e.stopPropagation();
+        SoundManager.playClick(); // Play click sound
         if (currentIndex > 0) {
             setIsFlipped(false);
             setTimeout(() => setCurrentIndex(prev => prev - 1), 150);
@@ -46,6 +49,7 @@ const MemoryMode = () => {
     };
 
     const handleFlip = () => {
+        SoundManager.playFlip(); // Play flip sound
         setIsFlipped(!isFlipped);
     };
 

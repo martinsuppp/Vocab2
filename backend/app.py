@@ -43,14 +43,17 @@ def get_words():
 def generate_exam():
     data = request.json
     filename = data.get('filename')
-    num_questions = data.get('num_questions', 10)
     
     if not filename:
         return jsonify({'error': 'Filename is required'}), 400
         
     try:
+        num_questions = int(data.get('num_questions', 10))
+        new_ratio = float(data.get('new_ratio', 20)) / 100.0  # Frontend sends 0-100
+        mistake_weight = float(data.get('mistake_weight', 5.0))
+
         all_words = data_loader.load_words(filename)
-        exam = mistake_tracker.generate_exam(all_words, num_questions)
+        exam = mistake_tracker.generate_exam(all_words, num_questions, new_ratio, mistake_weight)
         return jsonify(exam)
     except FileNotFoundError:
         return jsonify({'error': 'File not found'}), 404

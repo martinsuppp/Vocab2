@@ -25,6 +25,15 @@ def init_db():
             last_review_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS exam_attempts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            word TEXT,
+            is_correct BOOLEAN,
+            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
     
     conn.commit()
     conn.close()
