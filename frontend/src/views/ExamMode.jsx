@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { generateExam, submitExam } from '../api';
+import { generateExam, submitExam } from '../api.js';
 import { Check, X, Timer, RotateCcw, Home as HomeIcon, Award } from 'lucide-react';
 import SoundManager from '../utils/SoundManager';
 import confetti from 'canvas-confetti';

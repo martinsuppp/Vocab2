@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getFiles } from '../api';
+import { getFiles } from '../api.js';
 import { BookOpen, PenTool, Settings, BarChart } from 'lucide-react';
 import SoundManager from '../utils/SoundManager';
 

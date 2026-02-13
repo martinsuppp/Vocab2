@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Home as HomeIcon, ArrowUpDown, ArrowUp, ArrowDown, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { getStats, resetStats } from '../api';
+import { getStats, resetStats } from '../api.js';
 
 const Stats = () => {
     const navigate = useNavigate();

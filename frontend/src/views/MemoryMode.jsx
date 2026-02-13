@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { getWords } from '../api';
+import { getWords } from '../api.js';
 import { ArrowLeft, ArrowRight, RotateCw, Home as HomeIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SoundManager from '../utils/SoundManager'; // Import SoundManager

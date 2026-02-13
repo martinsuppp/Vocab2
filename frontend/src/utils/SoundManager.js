@@ -89,6 +89,38 @@ class SoundManager {
         this.playTone(600, 'sine', 0.2, now + 0.4);
         this.playTone(800, 'sine', 0.4, now + 0.6);
     }
+
+    playBGM() {
+        if (this.muted || this.bgmOscillator) return;
+
+        // Simple ambient drone
+        this.bgmOscillator = this.audioCtx.createOscillator();
+        this.bgmGain = this.audioCtx.createGain();
+
+        this.bgmOscillator.type = 'sine';
+        this.bgmOscillator.frequency.value = 100; // Low drone
+
+        this.bgmGain.gain.setValueAtTime(0.02, this.audioCtx.currentTime); // Very quiet
+
+        this.bgmOscillator.connect(this.bgmGain);
+        this.bgmGain.connect(this.audioCtx.destination);
+
+        this.bgmOscillator.start();
+    }
+
+    stopBGM() {
+        if (this.bgmOscillator) {
+            try {
+                this.bgmOscillator.stop();
+                this.bgmOscillator.disconnect();
+                this.bgmGain.disconnect();
+            } catch (e) {
+                console.warn("Error stopping BGM", e);
+            }
+            this.bgmOscillator = null;
+            this.bgmGain = null;
+        }
+    }
 }
 
 export default new SoundManager();
