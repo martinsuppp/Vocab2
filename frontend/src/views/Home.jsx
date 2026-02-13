@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getFiles } from '../api';
 import { BookOpen, PenTool, Settings, BarChart } from 'lucide-react';
+import SoundManager from '../utils/SoundManager';
 
 const Home = () => {
     const navigate = useNavigate();

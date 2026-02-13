@@ -3,8 +3,12 @@
 A tool for mastering English vocabulary through flashcards and adaptive quizzes.
 
 ## Features
-- **Memory Mode**: Flashcards for learning.
-- **Exam Mode**: Quizzes with mistake tracking.
+- **Memory Mode**: Interactive flashcards with sound effects for immersive learning.
+- **Exam Mode**: Adaptive quizzes that prioritize your recent mistakes (last 20 attempts).
+- **Advanced Statistics**: Track your progress with detailed charts of Lifetime vs Recent performance.
+- **Instant Feeback**: Toggle immediate answer reveal during exams.
+- **Customization**: Adjust mistake weighting, new word ratios, and enable/disable sound effects.
+
 ## Usage
 
 ### Prerequisite
@@ -19,8 +23,14 @@ A tool for mastering English vocabulary through flashcards and adaptive quizzes.
     ```
 3.  Open [http://localhost:5173](http://localhost:5173) in your browser.
 
+### Deployment / Backup
+To push your latest changes to GitHub (requires GitHub CLI `gh`):
+```bash
+./push_to_github.sh
+```
+
 ## Technologies
-- HTML5, CSS3, Vanilla JavaScript.
-- Web Audio API for real-time sound generation.
-- **Adaptive Learning**: Words you get wrong appear more often.
-- **Data Source**: Reads from local Excel/CSV files (simulating Google Sheets).
+- **Frontend**: React, Vite, Tailwind CSS, Framer Motion (Animations), Canvas Confetti.
+- **Backend**: Flask (Python), SQLite.
+- **Audio**: Web Audio API for real-time sound generation (no external assets).
+- **Adaptive Algorithm**: Weights words based on recent mistake history to optimize learning efficiency.

@@ -32,6 +32,8 @@ export const submitResults = async (results) => {
     return response.data;
 };
 
+export const submitExam = submitResults;
+
 export const getStats = async () => {
     const response = await api.get('/stats');
     return response.data;
