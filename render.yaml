@@ -3,7 +3,7 @@ services:
     name: vocab-master
     env: python
     buildCommand: "./build.sh"
-    startCommand: "pip install gunicorn && cd backend && gunicorn app:app --bind 0.0.0.0:$PORT"
+    startCommand: "cd backend && python -m gunicorn app:app --bind 0.0.0.0:$PORT"
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.0

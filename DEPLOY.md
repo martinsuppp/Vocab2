@@ -25,7 +25,7 @@ To make your app accessible from anywhere on the internet, we recommend using **
     - **Root Directory**: `.` (Leave blank / default).
     - **Runtime**: `Python 3`.
     - **Build Command**: `./build.sh`
-    - **Start Command**: `pip install gunicorn && cd backend && gunicorn app:app --bind 0.0.0.0:$PORT`
+    - **Start Command**: `cd backend && python -m gunicorn app:app --bind 0.0.0.0:$PORT`
     - **Instance Type**: Free.
 
 3.  **Add Environment Variables** (Required):
