@@ -1,49 +1,95 @@
-import axios from 'axios';
+import DataLoader from './services/DataLoader';
+import MistakeTracker from './services/MistakeTracker';
 
-const API_BASE_URL = import.meta.env.DEV
-    ? `http://${window.location.hostname}:5001/api`
-    : '/api';
+// Re-export services for direct access if needed
+export { DataLoader, MistakeTracker };
 
-const api = axios.create({
-    baseURL: API_BASE_URL,
-});
-
+/**
+ * Fetch list of available vocabulary files
+ * Replaces GET /api/files
+ */
 export const getFiles = async () => {
-    const response = await api.get('/files');
-    return response.data;
+    return DataLoader.listFiles();
 };
 
+/**
+ * Fetch words from specific file(s)
+ * Replaces GET /api/words?filename=...
+ * @param {string} filename - Comma-separated list of filenames
+ */
 export const getWords = async (filename) => {
-    const response = await api.get('/words', { params: { filename } });
-    return response.data;
+    const filenames = filename.split(',').map(f => f.trim());
+    let allWords = [];
+
+    for (const fname of filenames) {
+        if (!fname) continue;
+        const words = await DataLoader.loadWords(fname);
+        allWords = allWords.concat(words);
+    }
+    return allWords;
 };
 
+/**
+ * Generate an exam based on settings
+ * Replaces POST /api/exam
+ */
 export const generateExam = async (filename, settings) => {
-    // settings: { numQuestions, newRatio, mistakeWeight }
-    const response = await api.post('/exam', {
-        filename,
-        num_questions: settings.numQuestions,
-        new_ratio: settings.newRatio,
-        mistake_weight: settings.mistakeWeight
-    });
-    return response.data;
+    // 1. Get words
+    const allWords = await getWords(filename);
+
+    // 2. Generate exam locally
+    return MistakeTracker.generateExam(allWords, settings);
 };
 
+/**
+ * Submit exam results
+ * Replaces POST /api/submit
+ */
 export const submitResults = async (results) => {
-    const response = await api.post('/submit', { results });
-    return response.data;
+    // results: Array of { word: string, is_correct: boolean }
+
+    // 1. Record each result
+    results.forEach(result => {
+        MistakeTracker.recordResult(result.word, result.is_correct);
+    });
+
+    // 2. return updated stats for these words
+    const wordList = results.map(r => r.word);
+    const updatedStats = MistakeTracker.getStats(wordList);
+
+    return {
+        message: 'Results recorded successfully',
+        updated_stats: updatedStats
+    };
 };
 
 export const submitExam = submitResults;
 
+/**
+ * Get all stats
+ * Replaces GET /api/stats
+ */
 export const getStats = async () => {
-    const response = await api.get('/stats');
-    return response.data;
+    return MistakeTracker.getAllStats();
 };
 
+/**
+ * Reset stats
+ * Replaces DELETE /api/stats
+ */
 export const resetStats = async () => {
-    const response = await api.delete('/stats');
-    return response.data;
+    MistakeTracker.resetStats();
+    return { message: 'Stats reset successfully' };
+};
+
+const api = {
+    getFiles,
+    getWords,
+    generateExam,
+    submitResults,
+    submitExam,
+    getStats,
+    resetStats
 };
 
 export default api;
