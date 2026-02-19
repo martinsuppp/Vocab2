@@ -6,3 +6,4 @@ export default defineConfig({
   plugins: [react()],
   base: '/Vocab2/',
 })
+// Forced restart check

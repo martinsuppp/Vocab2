@@ -2,6 +2,7 @@ import { ArrowLeft, BookOpen, Layers, PenTool, LayoutGrid, Home, BarChart, Setti
 import useExamSettings from '../hooks/useExamSettings';
 import SettingsModal from './SettingsModal';
 import { useState } from 'react';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 
 const LearningLayout = ({ children }) => {
     const navigate = useNavigate();

@@ -180,9 +180,9 @@ const MemoryMode = () => {
                             <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-[#E0D6C8] overflow-hidden z-10 hidden group-hover:block hover:block">
                                 <div className="p-1">
                                     <button onClick={() => setWeakFilter(0)} className="w-full text-left px-4 py-2 text-sm hover:bg-[#F5F1E8] rounded-lg">All Words</button>
-                                    <button onClick={() => setWeakFilter(25)} className="w-full text-left px-4 py-2 text-sm hover:bg-[#F5F1E8] rounded-lg text-[#D35D47]">Weak (> 25% Error)</button>
-                                    <button onClick={() => setWeakFilter(50)} className="w-full text-left px-4 py-2 text-sm hover:bg-[#F5F1E8] rounded-lg text-[#D35D47]">Very Weak (> 50%)</button>
-                                    <button onClick={() => setWeakFilter(75)} className="w-full text-left px-4 py-2 text-sm hover:bg-[#F5F1E8] rounded-lg text-[#D35D47]">Critical (> 75%)</button>
+                                    <button onClick={() => setWeakFilter(25)} className="w-full text-left px-4 py-2 text-sm hover:bg-[#F5F1E8] rounded-lg text-[#D35D47]">Weak (&gt; 25% Error)</button>
+                                    <button onClick={() => setWeakFilter(50)} className="w-full text-left px-4 py-2 text-sm hover:bg-[#F5F1E8] rounded-lg text-[#D35D47]">Very Weak (&gt; 50%)</button>
+                                    <button onClick={() => setWeakFilter(75)} className="w-full text-left px-4 py-2 text-sm hover:bg-[#F5F1E8] rounded-lg text-[#D35D47]">Critical (&gt; 75%)</button>
                                 </div>
                             </div>
                         </div>
