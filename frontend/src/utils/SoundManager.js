@@ -125,8 +125,9 @@ class SoundManager {
 
     playHeartbeat() {
         if (this.muted) return;
+        console.log("SoundManager: Playing Heartbeat Thud");
         if (this.audioCtx.state === 'suspended') {
-            this.audioCtx.resume();
+            this.audioCtx.resume().catch(e => console.error("Audio Resume Failed", e));
         }
 
         const now = this.audioCtx.currentTime;

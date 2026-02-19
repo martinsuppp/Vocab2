@@ -29,6 +29,12 @@ const ExamMode = () => {
         console.log("ExamMode Mounted. Heartbeat Enabled:", heartbeatEnabled);
     }, [heartbeatEnabled]);
 
+    // Use a ref to track the latest value of heartbeatEnabled without breaking the interval/useEffect loop
+    const heartbeatEnabledRef = useRef(heartbeatEnabled);
+    useEffect(() => {
+        heartbeatEnabledRef.current = heartbeatEnabled;
+    }, [heartbeatEnabled]);
+
     // We still need filename from session
     const getFilename = () => {
         const sessionStr = localStorage.getItem('currentSession');
@@ -93,8 +99,12 @@ const ExamMode = () => {
                     const totalTime = timePerQuestion || 5;
                     const warningThreshold = totalTime <= 5 ? 2 : 5;
 
+                    console.log(`Timer Tick: ${prev} | EnableRef: ${heartbeatEnabledRef.current}`);
+
                     if (prev <= warningThreshold && prev > 0) {
-                        if (heartbeatEnabled) SoundManager.playHeartbeat();
+                        if (heartbeatEnabledRef.current) {
+                            SoundManager.playHeartbeat();
+                        }
                     }
                     if (prev <= 0) {
                         // Time's up for THIS question
@@ -106,7 +116,7 @@ const ExamMode = () => {
             }, 1000);
         }
         return () => clearInterval(timerRef.current);
-    }, [loading, questions, isFinished, isPaused, isProcessing, heartbeatEnabled]);
+    }, [loading, questions, isFinished, isPaused, isProcessing]);
 
     const handleTimeOut = () => {
         // Treat as wrong answer
