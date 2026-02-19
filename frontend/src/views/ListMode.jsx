@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import DataLoader from '../services/DataLoader';
 import LearningLayout from '../components/LearningLayout';
-import { Search } from 'lucide-react';
+import { Search, Volume2 } from 'lucide-react';
+import SoundManager from '../utils/SoundManager';
+import useExamSettings from '../hooks/useExamSettings';
 
 const ListMode = () => {
+    // Shared Settings State
+    const settings = useExamSettings();
+    const { ttsEnabled } = settings;
+
     const [loading, setLoading] = useState(true);
 
     // Data State
@@ -96,7 +102,7 @@ const ListMode = () => {
 
     if (loading) {
         return (
-            <LearningLayout>
+            <LearningLayout settings={settings}>
                 <div className="h-full flex items-center justify-center text-[#5C4B41]">
                     Loading...
                 </div>
@@ -105,7 +111,7 @@ const ListMode = () => {
     }
 
     return (
-        <LearningLayout>
+        <LearningLayout settings={settings}>
             <div className="max-w-6xl mx-auto p-6">
                 {/* Internal Header with Search */}
                 <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -163,8 +169,13 @@ const ListMode = () => {
                             className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow border border-[#E0D6C8] group relative flex flex-col justify-between min-h-[140px]"
                         >
                             <div>
-                                <h3 className="text-xl font-bold text-[#2C241F] font-serif mb-1 break-words">
+                                <h3
+                                    className="text-xl font-bold text-[#2C241F] font-serif mb-1 break-words cursor-pointer hover:text-[#2F5D62] transition-colors flex items-center gap-2"
+                                    onClick={() => ttsEnabled && SoundManager.speak(item.word)}
+                                    title={ttsEnabled ? "Click to listen" : "Enable TTS in settings to listen"}
+                                >
                                     {item.word}
+                                    {ttsEnabled && <Volume2 className="w-4 h-4 text-[#8C7B70] opacity-0 group-hover:opacity-100 transition-opacity" />}
                                 </h3>
                                 {item.phonetic && (
                                     <span className="text-sm text-[#8C7B70] font-sans block mb-2">/{item.phonetic}/</span>
