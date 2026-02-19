@@ -1,10 +1,15 @@
-import React from 'react';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, BookOpen, Layers, PenTool, LayoutGrid, Home, BarChart } from 'lucide-react';
+import { ArrowLeft, BookOpen, Layers, PenTool, LayoutGrid, Home, BarChart, Settings } from 'lucide-react';
+import useExamSettings from '../hooks/useExamSettings';
+import SettingsModal from './SettingsModal';
+import { useState } from 'react';
 
 const LearningLayout = ({ children }) => {
     const navigate = useNavigate();
     const location = useLocation();
+
+    // Settings Logic
+    const settings = useExamSettings();
+    const [showSettings, setShowSettings] = useState(false);
 
     // Determine current active tab based on path
     const path = location.pathname;
@@ -75,6 +80,13 @@ const LearningLayout = ({ children }) => {
                             <Home className="w-5 h-5" />
                         </button>
                         <button
+                            onClick={() => setShowSettings(true)}
+                            className="p-2 text-[#8C7B70] hover:text-[#2F5D62] hover:bg-[#F5F1E8] rounded-full transition-colors"
+                            title="Settings"
+                        >
+                            <Settings className="w-5 h-5" />
+                        </button>
+                        <button
                             onClick={() => navigate('/stats')}
                             className="p-2 text-[#8C7B70] hover:text-[#2F5D62] hover:bg-[#F5F1E8] rounded-full transition-colors"
                             title="Statistics"
@@ -89,6 +101,12 @@ const LearningLayout = ({ children }) => {
             <main className="flex-1 overflow-y-auto">
                 {children || <Outlet />}
             </main>
+
+            <SettingsModal
+                isOpen={showSettings}
+                onClose={() => setShowSettings(false)}
+                settings={settings}
+            />
         </div>
     );
 };

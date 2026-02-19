@@ -11,35 +11,28 @@ const ExamMode = () => {
     const navigate = useNavigate();
 
     // Config Loader
-    const getConfig = () => {
-        const urlFilename = searchParams.get('filename');
-        if (urlFilename) {
-            return {
-                filename: urlFilename,
-                numQuestions: parseInt(searchParams.get('numQuestions')) || 20,
-                instantFeedbackEnabled: searchParams.get('instantFeedback') === 'true',
-                newRatio: parseInt(searchParams.get('newRatio')) || 20,
-                mistakeWeight: parseInt(searchParams.get('mistakeWeight')) || 5
-            };
-        }
+    // [NEW] Read settings from global hook instead of session snapshot
+    // This allows "Advanced Settings" in Learning Hub to apply immediately
+    const settings = useExamSettings();
+    const {
+        numQuestions,
+        instantFeedback: instantFeedbackEnabled, // Alias for compatibility
+        newRatio,
+        mistakeWeight,
+        timePerQuestion
+    } = settings;
 
-        const sessionRaw = localStorage.getItem('currentSession');
-        if (sessionRaw) {
-            const session = JSON.parse(sessionRaw);
-            return {
-                filename: session.files ? session.files.join(',') : null,
-                numQuestions: session.settings?.numQuestions || 20,
-                instantFeedbackEnabled: session.settings?.instantFeedback !== false, // default true
-                newRatio: session.settings?.newRatio !== undefined ? session.settings.newRatio : 20,
-                mistakeWeight: session.settings?.mistakeWeight || 5,
-                timePerQuestion: session.settings?.timePerQuestion || 5
-            };
+    // We still need filename from session
+    const getFilename = () => {
+        const sessionStr = localStorage.getItem('currentSession');
+        if (sessionStr) {
+            const session = JSON.parse(sessionStr);
+            return session.files ? session.files[0] : null; // Assuming single file for now or first
         }
-        return {};
+        return null; // Should handle multi-file
     };
 
-    const config = getConfig();
-    const { filename, numQuestions, instantFeedbackEnabled, newRatio, mistakeWeight, timePerQuestion } = config;
+    const filename = getFilename();
 
     const [questions, setQuestions] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
