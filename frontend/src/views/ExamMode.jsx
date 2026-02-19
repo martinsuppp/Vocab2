@@ -21,7 +21,8 @@ const ExamMode = () => {
         newRatio,
         mistakeWeight,
         timePerQuestion,
-        heartbeatEnabled // [NEW]
+        heartbeatEnabled, // [NEW]
+        ttsEnabled // [NEW] TTS
     } = settings;
 
     // [DEBUG] Check if setting is received
@@ -122,6 +123,16 @@ const ExamMode = () => {
         // Treat as wrong answer
         handleAnswerProcess(null); // passing null implies time out / no selection
     };
+
+    // TTS: Speak Question when it appears
+    useEffect(() => {
+        if (!loading && !isFinished && questions[currentIndex] && ttsEnabled) {
+            // Small delay to ensure UI is ready
+            setTimeout(() => {
+                SoundManager.speak(questions[currentIndex].word);
+            }, 500);
+        }
+    }, [currentIndex, loading, isFinished, questions, ttsEnabled]);
 
     // Keyboard support
     useEffect(() => {
@@ -431,7 +442,16 @@ const ExamMode = () => {
                                 <div className="mb-6 space-y-4">
                                     <div className="p-4 bg-red-50 rounded-xl border border-red-100">
                                         <p className="text-[#8C7B70] text-sm uppercase tracking-widest mb-2 font-bold">Question</p>
-                                        <p className="text-5xl font-bold text-[#3D312A] font-serif">{questions[currentIndex].word}</p>
+                                        <p
+                                            className="text-5xl font-bold text-[#3D312A] font-serif cursor-pointer hover:text-[#2F5D62] transition-colors active:scale-95"
+                                            onClick={(e) => {
+                                                e.stopPropagation(); // Prevent dismissing the overlay
+                                                SoundManager.speak(questions[currentIndex].word);
+                                            }}
+                                            title="Click to hear pronunciation"
+                                        >
+                                            {questions[currentIndex].word} 🔊
+                                        </p>
                                     </div>
                                     <div className="p-4 bg-green-50 rounded-xl border border-green-100">
                                         <p className="text-[#8C7B70] text-sm uppercase tracking-widest mb-2 font-bold">Answer</p>

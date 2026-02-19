@@ -10,7 +10,25 @@ class SoundManager {
 
     toggleMuted() {
         this.muted = !this.muted;
+        // Cancel any ongoing speech when muting
+        if (this.muted) {
+            window.speechSynthesis.cancel();
+        }
         return this.muted;
+    }
+
+    speak(text) {
+        if (this.muted || !text) return;
+
+        // Cancel previous speech to prevent overlap/queueing
+        window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US'; // English US
+        utterance.rate = 1.0; // Normal speed
+        utterance.pitch = 1.0;
+
+        window.speechSynthesis.speak(utterance);
     }
 
     playTone(frequency, type, duration, startTime = 0) {

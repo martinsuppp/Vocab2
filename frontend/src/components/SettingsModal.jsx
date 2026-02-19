@@ -81,6 +81,17 @@ const SettingsModal = ({ isOpen, onClose, settings }) => {
                         </button>
                     </div>
 
+                    {/* TTS Toggle */}
+                    <div className="flex items-center justify-between p-3 bg-[#F9F7F5] rounded-xl border border-[#E0D6C8]">
+                        <label className="text-[#3D312A] text-sm font-medium">English Voice 🗣️</label>
+                        <button
+                            onClick={() => settings.setTtsEnabled(!settings.ttsEnabled)}
+                            className={`w-12 h-6 rounded-full p-1 transition-colors ${settings.ttsEnabled ? 'bg-[#2F5D62]' : 'bg-[#D6C2B0]'}`}
+                        >
+                            <div className={`w-4 h-4 bg-white rounded-full transition-transform shadow-sm ${settings.ttsEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
+                        </button>
+                    </div>
+
                     {/* Settings Sliders */}
                     <div className="space-y-4">
                         {/* Number of Questions */}

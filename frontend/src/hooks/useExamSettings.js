@@ -37,6 +37,12 @@ const useExamSettings = () => {
         return saved !== null ? saved === 'true' : true;
     });
 
+    // TTS Enabled
+    const [ttsEnabled, setTtsEnabled] = useState(() => {
+        const saved = localStorage.getItem('ttsEnabled');
+        return saved !== null ? saved === 'true' : true;
+    });
+
     // Persist settings whenever they change
     useEffect(() => {
         localStorage.setItem('numQuestions', numQuestions);
@@ -45,7 +51,8 @@ const useExamSettings = () => {
         localStorage.setItem('newRatio', newRatio);
         localStorage.setItem('mistakeWeight', mistakeWeight);
         localStorage.setItem('heartbeatEnabled', heartbeatEnabled);
-    }, [numQuestions, timePerQuestion, instantFeedback, newRatio, mistakeWeight, heartbeatEnabled]);
+        localStorage.setItem('ttsEnabled', ttsEnabled);
+    }, [numQuestions, timePerQuestion, instantFeedback, newRatio, mistakeWeight, heartbeatEnabled, ttsEnabled]);
 
     return {
         numQuestions, setNumQuestions,
@@ -53,7 +60,8 @@ const useExamSettings = () => {
         instantFeedback, setInstantFeedback,
         newRatio, setNewRatio,
         mistakeWeight, setMistakeWeight,
-        heartbeatEnabled, setHeartbeatEnabled
+        heartbeatEnabled, setHeartbeatEnabled,
+        ttsEnabled, setTtsEnabled
     };
 };
 

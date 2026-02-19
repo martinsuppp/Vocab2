@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight, RotateCw, Eye, Filter } from 'lucide-react';
 import { motion } from 'framer-motion';
 import SoundManager from '../utils/SoundManager';
 import LearningLayout from '../components/LearningLayout';
+import useExamSettings from '../hooks/useExamSettings';
 
 const MemoryMode = () => {
     const [searchParams] = useSearchParams();
@@ -34,6 +35,26 @@ const MemoryMode = () => {
     const [loading, setLoading] = useState(true);
     const [autoReveal, setAutoReveal] = useState(false);
     const [weakFilter, setWeakFilter] = useState(0);
+
+    // Settings for TTS
+    const settings = useExamSettings();
+    const { ttsEnabled } = settings;
+
+    // TTS Logic: Speak when English side is shown
+    useEffect(() => {
+        if (!ttsEnabled || filteredWords.length === 0) return;
+
+        // If not flipped (showing English Front), speak current word
+        if (!isFlipped) {
+            const word = filteredWords[currentIndex]?.word;
+            if (word) {
+                // Small delay to allow flip animation or page load to settle
+                setTimeout(() => {
+                    SoundManager.speak(word);
+                }, 300);
+            }
+        }
+    }, [currentIndex, isFlipped, filteredWords, ttsEnabled]);
 
     useEffect(() => {
         const loadWords = async () => {
@@ -158,7 +179,7 @@ const MemoryMode = () => {
     const currentWord = filteredWords[currentIndex];
 
     return (
-        <LearningLayout>
+        <LearningLayout settings={settings}>
             <div className="flex flex-col items-center justify-center min-h-full py-8 text-[#3D312A]">
                 <div className="w-full max-w-md mb-6 flex flex-wrap justify-between items-center text-[#8C7B70] gap-2">
                     <div className="text-sm font-medium bg-white px-4 py-1 rounded-full border border-[#E0D6C8] shadow-sm">
