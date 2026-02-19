@@ -18,7 +18,7 @@ const Home = () => {
     const [files, setFiles] = useState([]);
     const [selectedFiles, setSelectedFiles] = useState(() => {
         const saved = localStorage.getItem('selectedFiles');
-        return saved ? JSON.parse(saved) : [];
+        return saved ? JSON.parse(saved) : null;
     });
 
     // Initial Load Check
@@ -53,19 +53,7 @@ const Home = () => {
             setFiles(fileList);
             setDataLoaded(true);
 
-            // Auto-select logic
-            if (fileList.length > 0 && selectedFiles.length === 0) {
-                const saved = localStorage.getItem('selectedFiles');
-                if (!saved) {
-                    setSelectedFiles([fileList[0]]);
-                }
-            } else if (fileList.length > 0) {
-                // Filter out selected files that no longer exist
-                const validSelected = selectedFiles.filter(f => fileList.includes(f));
-                if (validSelected.length !== selectedFiles.length) {
-                    setSelectedFiles(validSelected);
-                }
-            }
+            // Auto-select logic moved to useEffect
 
         } catch (error) {
             console.error("Failed to fetch data:", error);
@@ -76,9 +64,27 @@ const Home = () => {
         }
     };
 
-    // Persist selected files
+    // Auto-select all files if none selected and no previous save (null state)
     useEffect(() => {
-        localStorage.setItem('selectedFiles', JSON.stringify(selectedFiles));
+        if (files.length > 0) {
+            if (selectedFiles === null) {
+                // No history -> Default to ALL
+                setSelectedFiles(files);
+            } else if (selectedFiles.length > 0) {
+                // Have history -> Filter out invalid files
+                const valid = selectedFiles.filter(f => files.includes(f));
+                if (valid.length !== selectedFiles.length) setSelectedFiles(valid);
+            } else {
+                // History exists but is empty (user deselected all) -> Keep empty
+            }
+        }
+    }, [files, selectedFiles]);
+
+    // Persist selected files (only if initialized)
+    useEffect(() => {
+        if (selectedFiles !== null) {
+            localStorage.setItem('selectedFiles', JSON.stringify(selectedFiles));
+        }
     }, [selectedFiles]);
 
     // Exam Settings (via Hook)
@@ -102,7 +108,7 @@ const Home = () => {
     };
 
     const handleStart = () => {
-        if (selectedFiles.length === 0) {
+        if (!selectedFiles || selectedFiles.length === 0) {
             alert("Please select at least one file!");
             return;
         }
@@ -207,12 +213,13 @@ const Home = () => {
                                         <input
                                             type="checkbox"
                                             value={file}
-                                            checked={selectedFiles.includes(file)}
+                                            checked={(selectedFiles || []).includes(file)}
                                             onChange={(e) => {
+                                                const current = selectedFiles || [];
                                                 if (e.target.checked) {
-                                                    setSelectedFiles([...selectedFiles, file]);
+                                                    setSelectedFiles([...current, file]);
                                                 } else {
-                                                    setSelectedFiles(selectedFiles.filter(f => f !== file));
+                                                    setSelectedFiles(current.filter(f => f !== file));
                                                 }
                                             }}
                                             className="w-4 h-4 rounded border-[#8C7B70] text-[#2F5D62] focus:ring-[#2F5D62] focus:ring-offset-[#F9F7F5]"
@@ -222,7 +229,7 @@ const Home = () => {
                                 ))}
                             </div>
                             <div className="mt-2 text-xs text-[#8C7B70] text-right font-medium">
-                                {selectedFiles.length} list{selectedFiles.length !== 1 ? 's' : ''} selected
+                                {(selectedFiles || []).length} list{(selectedFiles || []).length !== 1 ? 's' : ''} selected
                             </div>
                         </div>
 

@@ -31,6 +31,12 @@ const useExamSettings = () => {
         return saved ? Number(saved) : 5;
     });
 
+    // Heartbeat Sound Enabled
+    const [heartbeatEnabled, setHeartbeatEnabled] = useState(() => {
+        const saved = localStorage.getItem('heartbeatEnabled');
+        return saved !== null ? saved === 'true' : true;
+    });
+
     // Persist settings whenever they change
     useEffect(() => {
         localStorage.setItem('numQuestions', numQuestions);
@@ -38,14 +44,16 @@ const useExamSettings = () => {
         localStorage.setItem('instantFeedback', instantFeedback);
         localStorage.setItem('newRatio', newRatio);
         localStorage.setItem('mistakeWeight', mistakeWeight);
-    }, [numQuestions, timePerQuestion, instantFeedback, newRatio, mistakeWeight]);
+        localStorage.setItem('heartbeatEnabled', heartbeatEnabled);
+    }, [numQuestions, timePerQuestion, instantFeedback, newRatio, mistakeWeight, heartbeatEnabled]);
 
     return {
         numQuestions, setNumQuestions,
         timePerQuestion, setTimePerQuestion,
         instantFeedback, setInstantFeedback,
         newRatio, setNewRatio,
-        mistakeWeight, setMistakeWeight
+        mistakeWeight, setMistakeWeight,
+        heartbeatEnabled, setHeartbeatEnabled
     };
 };
 

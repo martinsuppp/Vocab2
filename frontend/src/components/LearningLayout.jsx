@@ -1,5 +1,6 @@
 import { ArrowLeft, BookOpen, Layers, PenTool, LayoutGrid, Home, BarChart, Settings } from 'lucide-react';
 import useExamSettings from '../hooks/useExamSettings';
+import SoundManager from '../utils/SoundManager';
 import SettingsModal from './SettingsModal';
 import { useState } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
@@ -7,6 +8,9 @@ import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 const LearningLayout = ({ children }) => {
     const navigate = useNavigate();
     const location = useLocation();
+
+    // Sound State
+    const [isMuted, setIsMuted] = useState(SoundManager.muted);
 
     // Settings Logic
     const settings = useExamSettings();
@@ -86,6 +90,16 @@ const LearningLayout = ({ children }) => {
                             title="Settings"
                         >
                             <Settings className="w-5 h-5" />
+                        </button>
+                        <button
+                            onClick={() => {
+                                const newMuted = SoundManager.toggleMuted();
+                                setIsMuted(newMuted);
+                            }}
+                            className="p-2 text-[#8C7B70] hover:text-[#2F5D62] hover:bg-[#F5F1E8] rounded-full transition-colors"
+                            title={isMuted ? "Unmute" : "Mute"}
+                        >
+                            {isMuted ? "🔇" : "🔊"}
                         </button>
                         <button
                             onClick={() => navigate('/stats')}

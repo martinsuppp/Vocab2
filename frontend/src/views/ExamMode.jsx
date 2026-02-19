@@ -20,7 +20,8 @@ const ExamMode = () => {
         instantFeedback: instantFeedbackEnabled, // Alias for compatibility
         newRatio,
         mistakeWeight,
-        timePerQuestion
+        timePerQuestion,
+        heartbeatEnabled // [NEW]
     } = settings;
 
     // We still need filename from session
@@ -83,8 +84,12 @@ const ExamMode = () => {
         if (!loading && questions.length > 0 && !isFinished && !isPaused && !isProcessing) {
             timerRef.current = setInterval(() => {
                 setTimeLeft((prev) => {
-                    if (prev <= 3 && prev > 0) {
-                        SoundManager.playTick();
+                    // Logic: If total time <= 5s, warn last 2s. Else warnings last 5s.
+                    const totalTime = timePerQuestion || 5;
+                    const warningThreshold = totalTime <= 5 ? 2 : 5;
+
+                    if (prev <= warningThreshold && prev > 0) {
+                        if (heartbeatEnabled) SoundManager.playHeartbeat();
                     }
                     if (prev <= 0) {
                         // Time's up for THIS question

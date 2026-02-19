@@ -91,21 +91,72 @@ class SoundManager {
     }
 
     playBGM() {
+        return; // BGM Disabled by user request
+        /*
         if (this.muted || this.bgmOscillator) return;
 
-        // Simple ambient drone
+        // Tense ambient drone (Dissonance)
+        const now = this.audioCtx.currentTime;
+
+        // Osc 1: Low Sawtooth (Aggressive base)
         this.bgmOscillator = this.audioCtx.createOscillator();
+        this.bgmOscillator.type = 'sawtooth';
+        this.bgmOscillator.frequency.value = 60; // Deep low
+
+        // Osc 2: Dissonant Sine (Creates beating/tension)
+        this.bgmOscillator2 = this.audioCtx.createOscillator();
+        this.bgmOscillator2.type = 'sine';
+        this.bgmOscillator2.frequency.value = 63; // Minor secondish clash
+
+        // Gain (Volume)
         this.bgmGain = this.audioCtx.createGain();
+        this.bgmGain.gain.setValueAtTime(0.03, now);
 
-        this.bgmOscillator.type = 'sine';
-        this.bgmOscillator.frequency.value = 100; // Low drone
-
-        this.bgmGain.gain.setValueAtTime(0.02, this.audioCtx.currentTime); // Very quiet
-
+        // Wiring
         this.bgmOscillator.connect(this.bgmGain);
+        this.bgmOscillator2.connect(this.bgmGain);
         this.bgmGain.connect(this.audioCtx.destination);
 
+        // Start
         this.bgmOscillator.start();
+        this.bgmOscillator2.start();
+        */
+    }
+
+    playHeartbeat() {
+        if (this.muted) return;
+        if (this.audioCtx.state === 'suspended') {
+            this.audioCtx.resume();
+        }
+
+        const now = this.audioCtx.currentTime;
+
+        // Helper to create a thud
+        const createThud = (time, freq, decay) => {
+            const osc = this.audioCtx.createOscillator();
+            const gain = this.audioCtx.createGain();
+
+            // Low sine/triangle for body
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, time);
+            osc.frequency.exponentialRampToValueAtTime(freq * 0.5, time + decay);
+
+            // Volume envelope
+            gain.gain.setValueAtTime(1.0, time); // Louder start
+            gain.gain.exponentialRampToValueAtTime(0.001, time + decay);
+
+            osc.connect(gain);
+            gain.connect(this.audioCtx.destination);
+
+            osc.start(time);
+            osc.stop(time + decay);
+        };
+
+        // Lub (First thud, lower, longer)
+        createThud(now, 60, 0.15);
+
+        // Dub (Second thud, slightly higher, shorter, delayed)
+        createThud(now + 0.25, 70, 0.12);
     }
 
     stopBGM() {
@@ -113,11 +164,16 @@ class SoundManager {
             try {
                 this.bgmOscillator.stop();
                 this.bgmOscillator.disconnect();
+                if (this.bgmOscillator2) {
+                    this.bgmOscillator2.stop();
+                    this.bgmOscillator2.disconnect();
+                }
                 this.bgmGain.disconnect();
             } catch (e) {
                 console.warn("Error stopping BGM", e);
             }
             this.bgmOscillator = null;
+            this.bgmOscillator2 = null;
             this.bgmGain = null;
         }
     }
