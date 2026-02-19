@@ -24,6 +24,11 @@ const ExamMode = () => {
         heartbeatEnabled // [NEW]
     } = settings;
 
+    // [DEBUG] Check if setting is received
+    useEffect(() => {
+        console.log("ExamMode Mounted. Heartbeat Enabled:", heartbeatEnabled);
+    }, [heartbeatEnabled]);
+
     // We still need filename from session
     const getFilename = () => {
         const sessionStr = localStorage.getItem('currentSession');
@@ -101,7 +106,7 @@ const ExamMode = () => {
             }, 1000);
         }
         return () => clearInterval(timerRef.current);
-    }, [loading, questions, isFinished, isPaused, isProcessing]);
+    }, [loading, questions, isFinished, isPaused, isProcessing, heartbeatEnabled]);
 
     const handleTimeOut = () => {
         // Treat as wrong answer
