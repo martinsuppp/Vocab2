@@ -5,6 +5,7 @@ import { Check, X, Timer, RotateCcw, Award, LayoutGrid } from 'lucide-react';
 import SoundManager from '../utils/SoundManager';
 import confetti from 'canvas-confetti';
 import LearningLayout from '../components/LearningLayout';
+import useExamSettings from '../hooks/useExamSettings';
 
 const ExamMode = () => {
     const [searchParams] = useSearchParams();
