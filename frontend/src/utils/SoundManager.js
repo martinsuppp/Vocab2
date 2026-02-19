@@ -2,6 +2,42 @@ class SoundManager {
     constructor() {
         this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         this.muted = false;
+        this.voices = [];
+
+        // Load voices (async)
+        if (typeof window !== 'undefined' && window.speechSynthesis) {
+            const load = () => {
+                this.voices = window.speechSynthesis.getVoices();
+            };
+            window.speechSynthesis.onvoiceschanged = load;
+            load();
+        }
+    }
+
+    getPreferredVoice() {
+        if (!this.voices.length) return null;
+
+        // Priority list for "Gentle/Human-like" voices
+        const priorityNames = [
+            "Google US English",
+            "Microsoft Zira",
+            "Samantha"
+        ];
+
+        // 1. Exact match in priority list
+        for (const name of priorityNames) {
+            const voice = this.voices.find(v => v.name.includes(name));
+            if (voice) return voice;
+        }
+
+        // 2. Enhanced/Premium en-US
+        const enhanced = this.voices.find(v =>
+            v.lang === 'en-US' && (v.name.includes("Premium") || v.name.includes("Enhanced") || v.name.includes("Natural"))
+        );
+        if (enhanced) return enhanced;
+
+        // 3. Fallback to any en-US
+        return this.voices.find(v => v.lang === 'en-US') || this.voices[0];
     }
 
     setMuted(isMuted) {
@@ -24,8 +60,18 @@ class SoundManager {
         window.speechSynthesis.cancel();
 
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'en-US'; // English US
-        utterance.rate = 1.0; // Normal speed
+
+        // Select Voice
+        const voice = this.getPreferredVoice();
+        if (voice) {
+            utterance.voice = voice;
+            utterance.lang = voice.lang;
+        } else {
+            utterance.lang = 'en-US';
+        }
+
+        // Tuning for "Gentle"
+        utterance.rate = 0.9; // Slightly slower
         utterance.pitch = 1.0;
 
         window.speechSynthesis.speak(utterance);
