@@ -246,23 +246,6 @@ const Home = () => {
                             </div>
                         </div>
 
-                        {/* Exam Settings (Simplified View) */}
-                        <div className="mb-6">
-                            <div className="flex justify-between text-sm mb-1">
-                                <span className="text-[#5C4B41] font-medium">Number of Questions</span>
-                                <span className="text-[#2F5D62] font-bold font-mono">{numQuestions}</span>
-                            </div>
-                            <input
-                                type="range"
-                                min="5"
-                                max="50"
-                                step="5"
-                                value={numQuestions}
-                                onChange={(e) => setNumQuestions(Number(e.target.value))}
-                                className="w-full h-2 bg-[#D6C2B0] rounded-lg appearance-none cursor-pointer accent-[#2F5D62]"
-                            />
-                        </div>
-
                         {/* Settings Modal */}
                         {showSettings && (
                             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
@@ -324,6 +307,23 @@ const Home = () => {
 
                                         {/* Settings Sliders */}
                                         <div className="space-y-4">
+                                            {/* Number of Questions */}
+                                            <div>
+                                                <div className="flex justify-between text-xs mb-1">
+                                                    <span className="text-[#5C4B41] font-medium">Number of Questions</span>
+                                                    <span className="text-[#2F5D62] font-semibold">{numQuestions}</span>
+                                                </div>
+                                                <input
+                                                    type="range"
+                                                    min="5"
+                                                    max="50"
+                                                    step="5"
+                                                    value={numQuestions}
+                                                    onChange={(e) => setNumQuestions(Number(e.target.value))}
+                                                    className="w-full h-1.5 bg-[#D6C2B0] rounded-lg appearance-none cursor-pointer accent-[#2F5D62]"
+                                                />
+                                            </div>
+
                                             {/* Time Per Question */}
                                             <div>
                                                 <div className="flex justify-between text-xs mb-1">
