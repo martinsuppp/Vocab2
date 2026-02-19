@@ -276,7 +276,7 @@ const ExamMode = () => {
 
     if (loading) {
         return (
-            <LearningLayout>
+            <LearningLayout settings={settings}>
                 <div className="h-full flex items-center justify-center text-[#5C4B41]">
                     Generating Exam...
                 </div>
@@ -286,7 +286,7 @@ const ExamMode = () => {
 
     if (questions.length === 0) {
         return (
-            <LearningLayout>
+            <LearningLayout settings={settings}>
                 <div className="h-full flex items-center justify-center text-[#5C4B41]">
                     No exam generated. Check selection.
                 </div>
@@ -299,7 +299,7 @@ const ExamMode = () => {
         const score = Math.round((correctCount / questions.length) * 100);
 
         return (
-            <LearningLayout>
+            <LearningLayout settings={settings}>
                 <div className="min-h-full py-8 flex flex-col items-center">
                     <div className="w-full max-w-4xl bg-white rounded-2xl shadow-sm p-8 border border-[#E0D6C8] animate-in fade-in zoom-in duration-300">
                         <div className="text-center mb-8">
@@ -409,7 +409,7 @@ const ExamMode = () => {
 
     // ... (rest of wrapper UI for exam taking)
     return (
-        <LearningLayout>
+        <LearningLayout settings={settings}>
             <div className="flex flex-col items-center justify-center min-h-full py-6 relative">
 
                 {/* Instant Feedback Overlay */}

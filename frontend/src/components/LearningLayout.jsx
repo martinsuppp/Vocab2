@@ -5,7 +5,7 @@ import SettingsModal from './SettingsModal';
 import { useState } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 
-const LearningLayout = ({ children }) => {
+const LearningLayout = ({ children, settings: propSettings }) => {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -13,7 +13,10 @@ const LearningLayout = ({ children }) => {
     const [isMuted, setIsMuted] = useState(SoundManager.muted);
 
     // Settings Logic
-    const settings = useExamSettings();
+    // If settings are passed from parent (e.g. ExamMode), use them.
+    // Otherwise, use internal hook (independent state).
+    const internalSettings = useExamSettings();
+    const settings = propSettings || internalSettings;
     const [showSettings, setShowSettings] = useState(false);
 
     // Determine current active tab based on path
