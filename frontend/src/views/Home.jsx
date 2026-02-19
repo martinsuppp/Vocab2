@@ -98,13 +98,20 @@ const Home = () => {
         return saved ? Number(saved) : 5;
     });
 
+    // New: Time Per Question (seconds)
+    const [timePerQuestion, setTimePerQuestion] = useState(() => {
+        const saved = localStorage.getItem('timePerQuestion');
+        return saved ? Number(saved) : 5;
+    });
+
     // Persist settings
     useEffect(() => {
         localStorage.setItem('numQuestions', numQuestions);
         localStorage.setItem('instantFeedback', instantFeedback);
         localStorage.setItem('newRatio', newRatio);
         localStorage.setItem('mistakeWeight', mistakeWeight);
-    }, [numQuestions, instantFeedback, newRatio, mistakeWeight]);
+        localStorage.setItem('timePerQuestion', timePerQuestion);
+    }, [numQuestions, instantFeedback, newRatio, mistakeWeight, timePerQuestion]);
 
     // Sound State
     const [isMuted, setIsMuted] = useState(SoundManager.muted);
@@ -127,7 +134,8 @@ const Home = () => {
                 numQuestions,
                 instantFeedback,
                 newRatio,
-                mistakeWeight
+                mistakeWeight,
+                timePerQuestion
             }
         };
         localStorage.setItem('currentSession', JSON.stringify(sessionConfig));
@@ -296,6 +304,23 @@ const Home = () => {
                                     >
                                         <div className={`w-4 h-4 bg-white rounded-full transition-transform shadow-sm ${instantFeedback ? 'translate-x-6' : 'translate-x-0'}`} />
                                     </button>
+                                </div>
+
+                                {/* [NEW] Time Per Question */}
+                                <div>
+                                    <div className="flex justify-between text-xs mb-1">
+                                        <span className="text-[#5C4B41]">Time Per Question</span>
+                                        <span className="text-[#2F5D62] font-semibold">{timePerQuestion}s</span>
+                                    </div>
+                                    <input
+                                        type="range"
+                                        min="3"
+                                        max="30"
+                                        step="1"
+                                        value={timePerQuestion}
+                                        onChange={(e) => setTimePerQuestion(Number(e.target.value))}
+                                        className="w-full h-1.5 bg-[#D6C2B0] rounded-lg appearance-none cursor-pointer accent-[#2F5D62]"
+                                    />
                                 </div>
 
                                 {/* New Word Ratio */}

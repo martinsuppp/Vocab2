@@ -31,14 +31,15 @@ const ExamMode = () => {
                 numQuestions: session.settings?.numQuestions || 20,
                 instantFeedbackEnabled: session.settings?.instantFeedback !== false, // default true
                 newRatio: session.settings?.newRatio !== undefined ? session.settings.newRatio : 20,
-                mistakeWeight: session.settings?.mistakeWeight || 5
+                mistakeWeight: session.settings?.mistakeWeight || 5,
+                timePerQuestion: session.settings?.timePerQuestion || 5
             };
         }
         return {};
     };
 
     const config = getConfig();
-    const { filename, numQuestions, instantFeedbackEnabled, newRatio, mistakeWeight } = config;
+    const { filename, numQuestions, instantFeedbackEnabled, newRatio, mistakeWeight, timePerQuestion } = config;
 
     const [questions, setQuestions] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -67,8 +68,8 @@ const ExamMode = () => {
             try {
                 const data = await generateExam(filename, { numQuestions, newRatio, mistakeWeight });
                 setQuestions(data);
-                // 10 seconds per question
-                setTimeLeft(data.length * 10);
+                // Initial Question Timer
+                setTimeLeft(timePerQuestion || 5);
             } catch (error) {
                 console.error("Failed to generate exam", error);
             } finally {
@@ -85,14 +86,15 @@ const ExamMode = () => {
     }, [filename, numQuestions, newRatio, mistakeWeight]);
 
     useEffect(() => {
-        if (!loading && questions.length > 0 && !isFinished && !isPaused) {
+        if (!loading && questions.length > 0 && !isFinished && !isPaused && !isProcessing) {
             timerRef.current = setInterval(() => {
                 setTimeLeft((prev) => {
-                    if (prev <= 6 && prev > 1) {
+                    if (prev <= 3 && prev > 0) {
                         SoundManager.playTick();
                     }
-                    if (prev <= 1) {
-                        finishExam();
+                    if (prev <= 0) {
+                        // Time's up for THIS question
+                        handleTimeOut();
                         return 0;
                     }
                     return prev - 1;
@@ -100,7 +102,12 @@ const ExamMode = () => {
             }, 1000);
         }
         return () => clearInterval(timerRef.current);
-    }, [loading, questions, isFinished, isPaused]);
+    }, [loading, questions, isFinished, isPaused, isProcessing]);
+
+    const handleTimeOut = () => {
+        // Treat as wrong answer
+        handleAnswerProcess(null); // passing null implies time out / no selection
+    };
 
     // Keyboard support
     useEffect(() => {
@@ -204,6 +211,9 @@ const ExamMode = () => {
         setIsPaused(false);
         setIsProcessing(false); // Reset processing lock
         setCanDismiss(false);
+
+        // Reset Timer for next question
+        setTimeLeft(timePerQuestion || 5);
 
         if (currentIndex < questions.length - 1) {
             setCurrentIndex(prev => prev + 1);
