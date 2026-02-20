@@ -265,7 +265,7 @@ const MemoryMode = () => {
                         style={{ transformStyle: 'preserve-3d' }}
                     >
                         {/* Front (English) */}
-                        <div className="absolute inset-0 backface-hidden bg-white rounded-3xl shadow-xl flex flex-col items-center justify-center border border-[#E0D6C8] group-hover:border-[#BFAF9E] transition-colors relative">
+                        <div className="absolute inset-0 backface-hidden bg-white rounded-3xl shadow-xl flex flex-col items-center justify-center border border-[#E0D6C8] group-hover:border-[#BFAF9E] transition-colors">
                             <span className="text-xs font-bold text-[#8C7B70] uppercase tracking-widest absolute top-8">Term</span>
 
                             {/* Star Toggle Button */}
@@ -287,7 +287,7 @@ const MemoryMode = () => {
 
                         {/* Back (Translation) */}
                         <div
-                            className="absolute inset-0 backface-hidden bg-[#2F5D62] rounded-3xl shadow-xl flex flex-col items-center justify-center border border-[#244A4E] relative"
+                            className="absolute inset-0 backface-hidden bg-[#2F5D62] rounded-3xl shadow-xl flex flex-col items-center justify-center border border-[#244A4E]"
                             style={{ transform: 'rotateY(180deg)' }}
                         >
                             <span className="text-xs font-bold text-[#D6C2B0] uppercase tracking-widest absolute top-8">Definition</span>
