@@ -11,7 +11,18 @@ import StarManager from '../services/StarManager';
 
 const MemoryMode = () => {
     const [searchParams] = useSearchParams();
-    const [starFilterActive, setStarFilterActive] = useState(false);
+    const [starFilterActive, setStarFilterActive] = useState(() => {
+        const sessionRaw = localStorage.getItem('currentSession');
+        if (sessionRaw) {
+            try {
+                const session = JSON.parse(sessionRaw);
+                return !!session.starFilterActive;
+            } catch (e) {
+                return false;
+            }
+        }
+        return false;
+    });
     const [updateTrigger, setUpdateTrigger] = useState(0);
 
     // Determine source files
@@ -21,13 +32,14 @@ const MemoryMode = () => {
 
         const sessionRaw = localStorage.getItem('currentSession');
         if (sessionRaw) {
-            const session = JSON.parse(sessionRaw);
-            if (session.starFilterActive !== undefined) {
-                setStarFilterActive(session.starFilterActive);
-            }
-            const targetFiles = session.activeFiles || session.files;
-            if (targetFiles && targetFiles.length > 0) {
-                return targetFiles.join(',');
+            try {
+                const session = JSON.parse(sessionRaw);
+                const targetFiles = session.activeFiles || session.files;
+                if (targetFiles && targetFiles.length > 0) {
+                    return targetFiles.join(',');
+                }
+            } catch (e) {
+                return null;
             }
         }
         return null;
