@@ -1,8 +1,9 @@
 import DataLoader from './services/DataLoader';
 import MistakeTracker from './services/MistakeTracker';
+import StarManager from './services/StarManager';
 
 // Re-export services for direct access if needed
-export { DataLoader, MistakeTracker };
+export { DataLoader, MistakeTracker, StarManager };
 
 /**
  * Fetch list of available vocabulary files
@@ -35,9 +36,14 @@ export const getWords = async (filename) => {
  */
 export const generateExam = async (filename, settings) => {
     // 1. Get words
-    const allWords = await getWords(filename);
+    let allWords = await getWords(filename);
 
-    // 2. Generate exam locally
+    // 2. Filter if star filter is active
+    if (settings && settings.starFilterActive) {
+        allWords = allWords.filter(w => StarManager.isStarred(w.word));
+    }
+
+    // 3. Generate exam locally
     return MistakeTracker.generateExam(allWords, settings);
 };
 

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import DataLoader from '../services/DataLoader';
 import LearningLayout from '../components/LearningLayout';
-import { Search, Volume2 } from 'lucide-react';
+import { Search, Volume2, Star } from 'lucide-react';
 import SoundManager from '../utils/SoundManager';
 import useExamSettings from '../hooks/useExamSettings';
+import StarManager from '../services/StarManager';
 
 const ListMode = () => {
     // Shared Settings State
@@ -19,6 +20,10 @@ const ListMode = () => {
     // Filter State
     const [selectedSheets, setSelectedSheets] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
+    const [starFilterActive, setStarFilterActive] = useState(false);
+
+    // UI trigger for re-render when stars change
+    const [updateTrigger, setUpdateTrigger] = useState(0);
 
     // Load Data based on Session Scope
     useEffect(() => {
@@ -38,6 +43,11 @@ const ListMode = () => {
 
                 setSheetNames(scopeFiles);
 
+                // Initialize Star Filter from session
+                if (session.starFilterActive !== undefined) {
+                    setStarFilterActive(session.starFilterActive);
+                }
+
                 // Load content for session files
                 const dataMap = {};
                 for (const sheet of scopeFiles) {
@@ -46,8 +56,12 @@ const ListMode = () => {
                 }
                 setAllData(dataMap);
 
-                // Initialize selection to ALL of the session files
-                setSelectedSheets(scopeFiles);
+                // Initialize selection to ALL of the session files (or saved)
+                if (session.activeFiles) {
+                    setSelectedSheets(session.activeFiles);
+                } else {
+                    setSelectedSheets(scopeFiles);
+                }
 
             } catch (error) {
                 console.error("Error loading data:", error);
@@ -66,12 +80,13 @@ const ListMode = () => {
             try {
                 const session = JSON.parse(sessionRaw);
                 session.activeFiles = selectedSheets;
+                session.starFilterActive = starFilterActive;
                 localStorage.setItem('currentSession', JSON.stringify(session));
             } catch (error) {
                 console.error("Error updating activeFiles in session", error);
             }
         }
-    }, [selectedSheets, loading]);
+    }, [selectedSheets, starFilterActive, loading]);
 
     // Derived State: Filtered Words
     const getFilteredWords = () => {
@@ -94,7 +109,18 @@ const ListMode = () => {
             );
         }
 
+        // 3. Filter by Starred
+        if (starFilterActive) {
+            words = words.filter(w => StarManager.isStarred(w.word));
+        }
+
         return words;
+    };
+
+    const handleToggleStar = (e, wordObj) => {
+        e.stopPropagation(); // prevent other clicks
+        StarManager.toggleStar(wordObj.word);
+        setUpdateTrigger(prev => prev + 1); // force re-render
     };
 
     const toggleSheet = (sheet) => {
@@ -157,6 +183,17 @@ const ListMode = () => {
                             All ({filteredWords.length})
                         </button>
 
+                        <button
+                            onClick={() => setStarFilterActive(!starFilterActive)}
+                            className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 ${starFilterActive
+                                ? 'bg-[#F2A359] text-white shadow-md border border-[#F2A359]'
+                                : 'bg-white border border-[#E0D6C8] text-[#8C7B70] hover:bg-[#F0EBE0]'
+                                }`}
+                        >
+                            <Star className={`w-4 h-4 ${starFilterActive ? 'fill-white' : ''}`} />
+                            Starred
+                        </button>
+
                         {sheetNames.map(sheet => {
                             const count = allData[sheet]?.length || 0;
                             const isSelected = selectedSheets.includes(sheet);
@@ -192,6 +229,13 @@ const ListMode = () => {
                                     {item.word}
                                     {ttsEnabled && <Volume2 className="w-4 h-4 text-[#8C7B70] opacity-0 group-hover:opacity-100 transition-opacity" />}
                                 </h3>
+                                {/* Star Right Corner */}
+                                <button
+                                    className="absolute top-4 right-4 p-2 text-[#D6C2B0] hover:text-[#F2A359] transition-colors focus:outline-none"
+                                    onClick={(e) => handleToggleStar(e, item)}
+                                >
+                                    <Star className={`w-5 h-5 ${StarManager.isStarred(item.word) ? 'fill-[#F2A359] text-[#F2A359]' : ''}`} />
+                                </button>
                                 {item.phonetic && (
                                     <span className="text-sm text-[#8C7B70] font-sans block mb-2">/{item.phonetic}/</span>
                                 )}

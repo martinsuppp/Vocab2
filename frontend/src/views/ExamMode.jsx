@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { generateExam, submitExam } from '../api.js';
-import { Check, X, Timer, RotateCcw, Award, LayoutGrid } from 'lucide-react';
+import { Check, X, Timer, RotateCcw, Award, LayoutGrid, Star } from 'lucide-react';
 import SoundManager from '../utils/SoundManager';
 import confetti from 'canvas-confetti';
 import LearningLayout from '../components/LearningLayout';
 import useExamSettings from '../hooks/useExamSettings';
+import StarManager from '../services/StarManager';
 
 const ExamMode = () => {
     const [searchParams] = useSearchParams();
@@ -51,6 +52,18 @@ const ExamMode = () => {
 
     const filename = getFilename();
 
+    // Read starFilterActive from session directly
+    const getStarFilterActive = () => {
+        const sessionStr = localStorage.getItem('currentSession');
+        if (sessionStr) {
+            const session = JSON.parse(sessionStr);
+            return !!session.starFilterActive;
+        }
+        return false;
+    };
+
+    const isStarFilterActive = getStarFilterActive();
+
     const [questions, setQuestions] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [userAnswers, setUserAnswers] = useState({});
@@ -66,6 +79,7 @@ const ExamMode = () => {
     // UX States
     const [isProcessing, setIsProcessing] = useState(false);
     const [canDismiss, setCanDismiss] = useState(false);
+    const [updateTrigger, setUpdateTrigger] = useState(0);
 
     const timerRef = useRef(null);
 
@@ -76,7 +90,12 @@ const ExamMode = () => {
                 return;
             }
             try {
-                const data = await generateExam(filename, { numQuestions, newRatio, mistakeWeight });
+                const data = await generateExam(filename, {
+                    numQuestions,
+                    newRatio,
+                    mistakeWeight,
+                    starFilterActive: isStarFilterActive
+                });
                 setQuestions(data);
                 // Initial Question Timer
                 setTimeLeft(timePerQuestion || 5);
@@ -479,7 +498,22 @@ const ExamMode = () => {
 
                 {/* Question Card */}
                 <div className="w-full max-w-2xl px-4">
-                    <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-[#E0D6C8]">
+                    <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-[#E0D6C8] relative">
+                        {/* Star Toggle Button */}
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                if (questions[currentIndex]?.word) {
+                                    StarManager.toggleStar(questions[currentIndex].word);
+                                    setUpdateTrigger(prev => prev + 1);
+                                }
+                            }}
+                            className="absolute top-6 right-6 p-2 text-[#D6C2B0] hover:text-[#F2A359] transition-colors z-10 focus:outline-none"
+                            title="Toggle Star"
+                        >
+                            <Star className={`w-6 h-6 ${questions[currentIndex] && StarManager.isStarred(questions[currentIndex].word) ? 'fill-[#F2A359] text-[#F2A359]' : ''}`} />
+                        </button>
+
                         <div className="p-8 text-center border-b border-[#F0EBE0] bg-[#FAF9F6]">
                             <span className="inline-block px-3 py-1 rounded-full bg-[#EBE5D9] text-[#5C4B41] text-xs font-bold tracking-wider mb-4">
                                 QUESTION {currentIndex + 1} / {questions.length}

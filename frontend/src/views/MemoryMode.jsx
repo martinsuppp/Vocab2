@@ -2,14 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { getWords } from '../api.js';
 import MistakeTracker from '../services/MistakeTracker';
-import { ArrowLeft, ArrowRight, RotateCw, Eye, Filter } from 'lucide-react';
+import { ArrowLeft, ArrowRight, RotateCw, Eye, Filter, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import SoundManager from '../utils/SoundManager';
 import LearningLayout from '../components/LearningLayout';
 import useExamSettings from '../hooks/useExamSettings';
+import StarManager from '../services/StarManager';
 
 const MemoryMode = () => {
     const [searchParams] = useSearchParams();
+    const [starFilterActive, setStarFilterActive] = useState(false);
+    const [updateTrigger, setUpdateTrigger] = useState(0);
 
     // Determine source files
     const getTargetFiles = () => {
@@ -19,6 +22,9 @@ const MemoryMode = () => {
         const sessionRaw = localStorage.getItem('currentSession');
         if (sessionRaw) {
             const session = JSON.parse(sessionRaw);
+            if (session.starFilterActive !== undefined) {
+                setStarFilterActive(session.starFilterActive);
+            }
             const targetFiles = session.activeFiles || session.files;
             if (targetFiles && targetFiles.length > 0) {
                 return targetFiles.join(',');
@@ -66,7 +72,6 @@ const MemoryMode = () => {
             try {
                 const data = await getWords(filename);
                 setWords(data);
-                setFilteredWords(data);
             } catch (error) {
                 console.error("Failed to load words", error);
             } finally {
@@ -79,13 +84,14 @@ const MemoryMode = () => {
     useEffect(() => {
         if (words.length === 0) return;
 
-        if (weakFilter === 0) {
-            setFilteredWords(words);
-        } else {
-            const wordList = words.map(w => w.word);
+        let result = [...words];
+
+        // 1. Weak Filter
+        if (weakFilter > 0) {
+            const wordList = result.map(w => w.word);
             const stats = MistakeTracker.getStats(wordList);
 
-            const filtered = words.filter(w => {
+            result = result.filter(w => {
                 const s = stats[w.word];
                 if (!s) return false;
                 const total = s.correct_count + s.mistake_count;
@@ -94,11 +100,23 @@ const MemoryMode = () => {
                 const errorRate = (s.mistake_count / total) * 100;
                 return errorRate >= weakFilter;
             });
-            setFilteredWords(filtered);
         }
+
+        // 2. Star Filter
+        if (starFilterActive) {
+            result = result.filter(w => StarManager.isStarred(w.word));
+        }
+
+        setFilteredWords(result);
         setCurrentIndex(0);
         setIsFlipped(false);
-    }, [weakFilter, words]);
+    }, [weakFilter, starFilterActive, words]);
+
+    const handleToggleStar = (e, word) => {
+        e.stopPropagation();
+        StarManager.toggleStar(word);
+        setUpdateTrigger(prev => prev + 1);
+    };
 
     const handleNext = (e) => {
         if (e) e.stopPropagation();
@@ -235,8 +253,18 @@ const MemoryMode = () => {
                         style={{ transformStyle: 'preserve-3d' }}
                     >
                         {/* Front (English) */}
-                        <div className="absolute inset-0 backface-hidden bg-white rounded-3xl shadow-xl flex flex-col items-center justify-center border border-[#E0D6C8] group-hover:border-[#BFAF9E] transition-colors">
+                        <div className="absolute inset-0 backface-hidden bg-white rounded-3xl shadow-xl flex flex-col items-center justify-center border border-[#E0D6C8] group-hover:border-[#BFAF9E] transition-colors relative">
                             <span className="text-xs font-bold text-[#8C7B70] uppercase tracking-widest absolute top-8">Term</span>
+
+                            {/* Star Toggle Button */}
+                            <button
+                                onClick={(e) => handleToggleStar(e, currentWord.word)}
+                                className="absolute top-6 right-6 p-2 text-[#D6C2B0] hover:text-[#F2A359] transition-colors z-10"
+                                title="Toggle Star"
+                            >
+                                <Star className={`w-6 h-6 ${StarManager.isStarred(currentWord.word) ? 'fill-[#F2A359] text-[#F2A359]' : ''}`} />
+                            </button>
+
                             <h2 className="text-5xl font-bold text-[#3D312A] text-center px-4 break-words font-serif">
                                 {currentWord.word}
                             </h2>
@@ -247,10 +275,20 @@ const MemoryMode = () => {
 
                         {/* Back (Translation) */}
                         <div
-                            className="absolute inset-0 backface-hidden bg-[#2F5D62] rounded-3xl shadow-xl flex flex-col items-center justify-center border border-[#244A4E]"
+                            className="absolute inset-0 backface-hidden bg-[#2F5D62] rounded-3xl shadow-xl flex flex-col items-center justify-center border border-[#244A4E] relative"
                             style={{ transform: 'rotateY(180deg)' }}
                         >
                             <span className="text-xs font-bold text-[#D6C2B0] uppercase tracking-widest absolute top-8">Definition</span>
+
+                            {/* Star Toggle Button */}
+                            <button
+                                onClick={(e) => handleToggleStar(e, currentWord.word)}
+                                className="absolute top-6 right-6 p-2 text-[#D6C2B0] hover:text-[#F2A359] transition-colors z-10"
+                                title="Toggle Star"
+                            >
+                                <Star className={`w-6 h-6 ${StarManager.isStarred(currentWord.word) ? 'fill-[#F2A359] text-[#F2A359]' : ''}`} />
+                            </button>
+
                             <h2 className="text-4xl font-bold text-[#F5F1E8] text-center px-4 break-words leading-relaxed font-serif">
                                 {currentWord.translation}
                             </h2>
