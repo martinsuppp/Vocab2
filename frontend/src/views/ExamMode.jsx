@@ -41,9 +41,12 @@ const ExamMode = () => {
         const sessionStr = localStorage.getItem('currentSession');
         if (sessionStr) {
             const session = JSON.parse(sessionStr);
-            return session.files ? session.files[0] : null; // Assuming single file for now or first
+            const targetFiles = session.activeFiles || session.files;
+            if (targetFiles && targetFiles.length > 0) {
+                return targetFiles.join(',');
+            }
         }
-        return null; // Should handle multi-file
+        return null;
     };
 
     const filename = getFilename();

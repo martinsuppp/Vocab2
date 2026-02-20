@@ -58,6 +58,21 @@ const ListMode = () => {
         fetchData();
     }, []);
 
+    // Sync active scope to session for other modes (Memory, Exam)
+    useEffect(() => {
+        if (loading) return; // Don't sync during initial load
+        const sessionRaw = localStorage.getItem('currentSession');
+        if (sessionRaw) {
+            try {
+                const session = JSON.parse(sessionRaw);
+                session.activeFiles = selectedSheets;
+                localStorage.setItem('currentSession', JSON.stringify(session));
+            } catch (error) {
+                console.error("Error updating activeFiles in session", error);
+            }
+        }
+    }, [selectedSheets, loading]);
+
     // Derived State: Filtered Words
     const getFilteredWords = () => {
         let words = [];

@@ -19,8 +19,9 @@ const MemoryMode = () => {
         const sessionRaw = localStorage.getItem('currentSession');
         if (sessionRaw) {
             const session = JSON.parse(sessionRaw);
-            if (session.files && session.files.length > 0) {
-                return session.files.join(',');
+            const targetFiles = session.activeFiles || session.files;
+            if (targetFiles && targetFiles.length > 0) {
+                return targetFiles.join(',');
             }
         }
         return null;

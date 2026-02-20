@@ -116,6 +116,7 @@ const Home = () => {
         // Save current session configuration
         const sessionConfig = {
             files: selectedFiles,
+            activeFiles: selectedFiles, // Initialize active files to all selected files
             settings: {
                 numQuestions,
                 instantFeedback,
