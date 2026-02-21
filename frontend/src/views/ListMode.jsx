@@ -132,17 +132,22 @@ const ListMode = () => {
     };
 
     const toggleAll = () => {
-        // If in chemistry mode, 'all' should only toggle the valid sheets
-        let validSheets = sheetNames;
-        if (settings.isChemistryMode) {
-            validSheets = sheetNames.filter(sheet => {
-                const words = allData[sheet] || [];
-                return words.some(w => w.phonetic && /^[+-]\d+$/.test(w.phonetic.trim()));
-            });
-        }
+        // Evaluate valid sheets based on Chemistry Mode context
+        let validSheets = sheetNames.filter(sheet => {
+            const words = allData[sheet] || [];
+            const hasChemWords = words.some(w => isChemWord(w));
+
+            if (settings.isChemistryMode) {
+                // In Chem mode, only keep sheets with at least one chem word
+                return hasChemWords;
+            } else {
+                // In Normal mode, hide sheets that contain chem words
+                return !hasChemWords;
+            }
+        });
 
         // We consider 'all selected' if every valid sheet is in selectedSheets
-        const allSelected = validSheets.every(s => selectedSheets.includes(s));
+        const allSelected = validSheets.length > 0 && validSheets.every(s => selectedSheets.includes(s));
 
         if (allSelected) {
             setSelectedSheets([]);
@@ -153,7 +158,11 @@ const ListMode = () => {
 
     const isChemWord = (w) => w.phonetic && /^[+-]\d+$/.test(w.phonetic.trim());
 
-    const filteredWords = getFilteredWords().filter(w => !settings.isChemistryMode || isChemWord(w));
+    // Filter individual words based on current mode
+    const filteredWords = getFilteredWords().filter(w => {
+        if (settings.isChemistryMode) return isChemWord(w);
+        return !isChemWord(w); // Hide chem words in normal mode too
+    });
 
     if (loading) {
         return (
@@ -210,17 +219,22 @@ const ListMode = () => {
 
                         {sheetNames.map(sheet => {
                             const words = allData[sheet] || [];
+                            const hasChemWords = words.some(w => isChemWord(w));
 
-                            // Let's see how many valid words this sheet actually has
-                            let validWords = words;
-                            if (settings.isChemistryMode) {
-                                validWords = words.filter(w => isChemWord(w));
-                            }
+                            // Completely skip rendering the tab if it violates the mode
+                            if (settings.isChemistryMode && !hasChemWords) return null;
+                            if (!settings.isChemistryMode && hasChemWords) return null;
+
+                            // Calculate count for current context
+                            const validWords = words.filter(w => {
+                                if (settings.isChemistryMode) return isChemWord(w);
+                                return !isChemWord(w);
+                            });
 
                             const count = validWords.length;
 
-                            // Skip rendering this button if chemistry mode is active and count is 0
-                            if (settings.isChemistryMode && count === 0) return null;
+                            // Extra safety: don't render empty tabs
+                            if (count === 0) return null;
 
                             const isSelected = selectedSheets.includes(sheet);
                             return (
