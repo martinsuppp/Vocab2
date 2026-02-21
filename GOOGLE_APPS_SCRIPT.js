@@ -23,11 +23,10 @@ function doGet(e) {
 }
 
 function isValidRow(r) {
-    const en = String(r[0] || '').trim();
-    const zh = String(r[1] || '').trim();
-    if (!en || !zh) return false;
-    // 第一欄須含英文字母，第二欄須含中日韓或英文
-    if (!/[a-zA-Z]/.test(en)) return false;
-    if (!zh) return false;
+    const col1 = String(r[0] || '').trim();
+    const col2 = String(r[1] || '').trim();
+    if (!col1 || !col2) return false;
+    // 第一或第二欄要有英文字母 (支援 "英文-中文" 或是 "中文-英文" 的格式)
+    if (!/[a-zA-Z]/.test(col1) && !/[a-zA-Z]/.test(col2)) return false;
     return true;
 }
