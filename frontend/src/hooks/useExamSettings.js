@@ -37,10 +37,15 @@ const useExamSettings = () => {
         return saved !== null ? saved === 'true' : true;
     });
 
-    // TTS Enabled
     const [ttsEnabled, setTtsEnabled] = useState(() => {
         const saved = localStorage.getItem('ttsEnabled');
-        return saved !== null ? saved === 'true' : true;
+        return saved !== null ? saved === 'true' : false;
+    });
+
+    // Chemistry Mode
+    const [isChemistryMode, setIsChemistryMode] = useState(() => {
+        const saved = localStorage.getItem('isChemistryMode');
+        return saved !== null ? saved === 'true' : false;
     });
 
     // Persist settings whenever they change
@@ -50,34 +55,20 @@ const useExamSettings = () => {
         localStorage.setItem('instantFeedback', instantFeedback);
         localStorage.setItem('newRatio', newRatio);
         localStorage.setItem('mistakeWeight', mistakeWeight);
-        localStorage.setItem('examSettings', JSON.stringify(settings));
-    }, [settings]);
-
-    // Helper function to create individual setters
-    const createSetter = (key) => (value) => {
-        setSettings(prevSettings => ({
-            ...prevSettings,
-            [key]: value
-        }));
-    };
+        localStorage.setItem('heartbeatEnabled', heartbeatEnabled);
+        localStorage.setItem('ttsEnabled', ttsEnabled);
+        localStorage.setItem('isChemistryMode', isChemistryMode);
+    }, [numQuestions, timePerQuestion, instantFeedback, newRatio, mistakeWeight, heartbeatEnabled, ttsEnabled, isChemistryMode]);
 
     return {
-        numQuestions: settings.numQuestions,
-        setNumQuestions: createSetter('numQuestions'),
-        timePerQuestion: settings.timePerQuestion,
-        setTimePerQuestion: createSetter('timePerQuestion'),
-        instantFeedback: settings.instantFeedback,
-        setInstantFeedback: createSetter('instantFeedback'),
-        newRatio: settings.newRatio,
-        setNewRatio: createSetter('newRatio'),
-        mistakeWeight: settings.mistakeWeight,
-        setMistakeWeight: createSetter('mistakeWeight'),
-        heartbeatEnabled: settings.heartbeatEnabled,
-        setHeartbeatEnabled: createSetter('heartbeatEnabled'),
-        ttsEnabled: settings.ttsEnabled,
-        setTtsEnabled: createSetter('ttsEnabled'),
-        isChemistryMode: settings.isChemistryMode,
-        setIsChemistryMode: createSetter('isChemistryMode'),
+        numQuestions, setNumQuestions,
+        timePerQuestion, setTimePerQuestion,
+        instantFeedback, setInstantFeedback,
+        newRatio, setNewRatio,
+        mistakeWeight, setMistakeWeight,
+        heartbeatEnabled, setHeartbeatEnabled,
+        ttsEnabled, setTtsEnabled,
+        isChemistryMode, setIsChemistryMode
     };
 };
 
