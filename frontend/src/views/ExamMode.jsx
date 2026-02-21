@@ -96,7 +96,8 @@ const ExamMode = () => {
                     newRatio,
                     mistakeWeight,
                     starFilterActive: isStarFilterActive,
-                    examFormat // [NEW] pass examFormat setting
+                    examFormat,
+                    isChemistryMode // [FIX] Pass chemistry mode state to backend
                 });
                 setQuestions(data);
                 // Initial Question Timer
@@ -114,7 +115,7 @@ const ExamMode = () => {
             SoundManager.stopBGM();
             if (timerRef.current) clearInterval(timerRef.current);
         };
-    }, [filename, numQuestions, newRatio, mistakeWeight, examFormat]); // added examFormat to deps
+    }, [filename, numQuestions, newRatio, mistakeWeight, examFormat, isChemistryMode]); // Added isChemistryMode to deps
 
     useEffect(() => {
         if (!loading && questions.length > 0 && !isFinished && !isPaused && !isProcessing) {
