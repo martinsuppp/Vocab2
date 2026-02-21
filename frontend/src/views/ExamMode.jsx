@@ -193,7 +193,9 @@ const ExamMode = () => {
         setIsProcessing(true);
 
         const currentQ = questions[currentIndex];
-        const isCorrect = selectedOption && selectedOption.word === currentQ.word;
+        const isCorrect = currentQ.isAtomic
+            ? selectedOption?.translation === currentQ.correct_translation
+            : selectedOption?.word === currentQ.word;
 
         if (selectedOption) {
             if (isCorrect) SoundManager.playCorrect();
