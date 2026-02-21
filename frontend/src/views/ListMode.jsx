@@ -9,7 +9,7 @@ import StarManager from '../services/StarManager';
 const ListMode = () => {
     // Shared Settings State
     const settings = useExamSettings();
-    const { ttsEnabled } = settings;
+    const { ttsEnabled, isChemistryMode } = settings;
 
     const [loading, setLoading] = useState(true);
 
@@ -237,7 +237,9 @@ const ListMode = () => {
                                     <Star className={`w-5 h-5 ${StarManager.isStarred(item.word) ? 'fill-[#F2A359] text-[#F2A359]' : ''}`} />
                                 </button>
                                 {item.phonetic && (
-                                    <span className="text-sm text-[#8C7B70] font-sans block mb-2">/{item.phonetic}/</span>
+                                    <span className={`block mb-2 transition-all ${isChemistryMode ? 'text-lg font-bold text-[#2F5D62] font-mono' : 'text-sm text-[#8C7B70] font-sans'}`}>
+                                        {isChemistryMode ? item.phonetic : `/${item.phonetic}/`}
+                                    </span>
                                 )}
                             </div>
                             <div>

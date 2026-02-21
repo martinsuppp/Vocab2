@@ -57,7 +57,7 @@ const MemoryMode = () => {
 
     // Settings for TTS
     const settings = useExamSettings();
-    const { ttsEnabled } = settings;
+    const { ttsEnabled, isChemistryMode } = settings;
 
     // TTS Logic: Speak when English side is shown
     useEffect(() => {
@@ -266,7 +266,9 @@ const MemoryMode = () => {
                     >
                         {/* Front (English) */}
                         <div className="absolute inset-0 backface-hidden bg-white rounded-3xl shadow-xl flex flex-col items-center justify-center border border-[#E0D6C8] group-hover:border-[#BFAF9E] transition-colors">
-                            <span className="text-xs font-bold text-[#8C7B70] uppercase tracking-widest absolute top-8">Term</span>
+                            <span className="text-xs font-bold text-[#8C7B70] uppercase tracking-widest absolute top-8">
+                                {isChemistryMode ? 'Element / Tag' : 'Term'}
+                            </span>
 
                             {/* Star Toggle Button */}
                             <button
@@ -280,6 +282,13 @@ const MemoryMode = () => {
                             <h2 className="text-5xl font-bold text-[#3D312A] text-center px-4 break-words font-serif">
                                 {currentWord.word}
                             </h2>
+
+                            {isChemistryMode && currentWord.phonetic && (
+                                <p className="text-3xl font-bold text-[#2F5D62] mt-4 font-mono">
+                                    {currentWord.phonetic}
+                                </p>
+                            )}
+
                             <p className="absolute bottom-8 text-[#8C7B70] text-sm flex items-center gap-2">
                                 <RotateCw className="w-4 h-4" /> Tap to flip
                             </p>
@@ -290,7 +299,9 @@ const MemoryMode = () => {
                             className="absolute inset-0 backface-hidden bg-[#2F5D62] rounded-3xl shadow-xl flex flex-col items-center justify-center border border-[#244A4E]"
                             style={{ transform: 'rotateY(180deg)' }}
                         >
-                            <span className="text-xs font-bold text-[#D6C2B0] uppercase tracking-widest absolute top-8">Definition</span>
+                            <span className="text-xs font-bold text-[#D6C2B0] uppercase tracking-widest absolute top-8">
+                                {isChemistryMode ? 'Details' : 'Definition'}
+                            </span>
 
                             {/* Star Toggle Button */}
                             <button
@@ -304,6 +315,12 @@ const MemoryMode = () => {
                             <h2 className="text-4xl font-bold text-[#F5F1E8] text-center px-4 break-words leading-relaxed font-serif">
                                 {currentWord.translation}
                             </h2>
+
+                            {isChemistryMode && currentWord.phonetic && (
+                                <p className="text-3xl font-bold text-[#A3C9C7] mt-4 font-mono">
+                                    {currentWord.phonetic}
+                                </p>
+                            )}
                         </div>
                     </motion.div>
                 </div>

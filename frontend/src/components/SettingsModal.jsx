@@ -161,6 +161,40 @@ const SettingsModal = ({ isOpen, onClose, settings }) => {
                                 className="w-full h-1.5 bg-[#D6C2B0] rounded-lg appearance-none cursor-pointer accent-red-500"
                             />
                         </div>
+
+                        {/* TTS Toggle */}
+                        <div className="flex items-center justify-between p-4 bg-[#F9F7F5] rounded-xl border border-[#E0D6C8]">
+                            <div>
+                                <h3 className="font-bold text-[#3D312A] mb-1">🗣️ English Voice (TTS)</h3>
+                                <p className="text-sm text-[#8C7B70]">Read English words aloud.</p>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    className="sr-only peer"
+                                    checked={ttsEnabled}
+                                    onChange={(e) => updateSetting('ttsEnabled', e.target.checked)}
+                                />
+                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#2F5D62]"></div>
+                            </label>
+                        </div>
+
+                        {/* Chemistry Mode Toggle */}
+                        <div className="flex items-center justify-between p-4 bg-[#F9F7F5] rounded-xl border border-[#E0D6C8]">
+                            <div>
+                                <h3 className="font-bold text-[#3D312A] mb-1">🧪 Chemistry Mode</h3>
+                                <p className="text-sm text-[#8C7B70]">Display phonetic column as atomic number/key data.</p>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    className="sr-only peer"
+                                    checked={isChemistryMode}
+                                    onChange={(e) => updateSetting('isChemistryMode', e.target.checked)}
+                                />
+                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#F2A359]"></div>
+                            </label>
+                        </div>
                     </div>
                 </div>
 
