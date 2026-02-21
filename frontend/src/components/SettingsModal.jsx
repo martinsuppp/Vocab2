@@ -117,6 +117,20 @@ const SettingsModal = ({ isOpen, onClose, settings }) => {
                             />
                         </div>
 
+                        {/* Exam Format Mode */}
+                        <div className="flex flex-col gap-1 p-4 bg-[#F9F7F5] rounded-xl border border-[#E0D6C8]">
+                            <h3 className="font-bold text-[#3D312A] mb-1">📝 Exam Format</h3>
+                            <select
+                                value={settings.examFormat || 'standard'}
+                                onChange={(e) => settings.setExamFormat(e.target.value)}
+                                className="w-full p-2 rounded-lg bg-white border border-[#E0D6C8] text-[#5C4B41] focus:outline-none focus:border-[#2F5D62]"
+                            >
+                                <option value="standard">Standard (Word → Translation)</option>
+                                <option value="atomic">Atomic (Word+Translation → Phonetic)</option>
+                                <option value="mixed">Mixed (Randomly toggled)</option>
+                            </select>
+                        </div>
+
                         {/* Time Per Question */}
                         <div>
                             <div className="flex justify-between text-xs mb-1">

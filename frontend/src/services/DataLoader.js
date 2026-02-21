@@ -68,6 +68,7 @@ const DataLoader = {
                         return {
                             word: r.en,
                             translation: combinedTranslation,
+                            zh: zhStr, // Keep pure version for individual layout
                             phonetic: r.phonetic, // Kept for backward compatibility or future use
                             example: r.example
                         };

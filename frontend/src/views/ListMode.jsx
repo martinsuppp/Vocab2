@@ -239,7 +239,10 @@ const ListMode = () => {
                             </div>
                             <div>
                                 <div className="h-px bg-[#F0EBE0] w-full my-2"></div>
-                                <p className="text-[#5C4B41] text-sm font-medium">{item.translation}</p>
+                                <p className="text-[#5C4B41] text-sm font-medium">
+                                    {item.zh}
+                                    {item.phonetic && <sup className="text-[0.7em] ml-0.5 font-bold text-[#8C7B70]">{item.phonetic}</sup>}
+                                </p>
                             </div>
                         </div>
                     ))}

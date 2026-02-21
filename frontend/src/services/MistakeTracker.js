@@ -162,7 +162,64 @@ const MistakeTracker = {
 
         // Generate questions
         return selectedWords.map(target => {
-            // Pick 3 distractors
+            const formatSetting = settings.examFormat || 'standard';
+            let useAtomic = formatSetting === 'atomic';
+            if (formatSetting === 'mixed') {
+                useAtomic = Math.random() > 0.5;
+            }
+
+            if (useAtomic) {
+                // Determine base value for distractors
+                const baseVal = parseInt(target.phonetic);
+                let isNumeric = !isNaN(baseVal);
+                let optionsData = [target];
+
+                if (isNumeric) {
+                    // Generate numeric distractors
+                    const generated = new Set();
+                    generated.add(baseVal);
+
+                    while (generated.size < 4) {
+                        const offset = Math.floor(Math.random() * 7) - 3; // -3 to +3
+                        const distractorVal = baseVal + offset;
+                        if (!generated.has(distractorVal)) {
+                            generated.add(distractorVal);
+                            const formattedVal = distractorVal > 0 ? `+${distractorVal}` : `${distractorVal}`;
+                            optionsData.push({
+                                word: `dummy_${formattedVal}`,
+                                translation: target.zh, // Unused for display in atomic answer, but keep valid obj
+                                phonetic: formattedVal
+                            });
+                        }
+                    }
+                } else {
+                    // Fallback to purely random phonetic values from other words if it's not a number
+                    const distractors = allWords.filter(w => w.word !== target.word && w.phonetic);
+                    if (distractors.length >= 3) {
+                        const shuffled = [...distractors].sort(() => 0.5 - Math.random());
+                        optionsData = optionsData.concat(shuffled.slice(0, 3));
+                    } else {
+                        optionsData = optionsData.concat(distractors);
+                    }
+                }
+
+                // Shuffle options
+                optionsData.sort(() => 0.5 - Math.random());
+
+                return {
+                    isAtomic: true,
+                    word: `${target.word} (${target.zh})`,
+                    correct_translation: target.phonetic, // Only the phonetic part is the answer
+                    target_word: target.word, // For tracking stats correctly
+                    options: optionsData.map(o => ({
+                        word: o.word,
+                        isAtomicOption: true,
+                        translation: o.phonetic // Display phonetic as the option text
+                    }))
+                };
+            }
+
+            // Standard Generation Fallback
             const distractors = allWords.filter(w => w.word !== target.word);
             let options = [target];
 
@@ -178,11 +235,15 @@ const MistakeTracker = {
             options.sort(() => 0.5 - Math.random());
 
             return {
+                isAtomic: false,
+                target_word: target.word,
                 word: target.word,
                 correct_translation: target.translation,
                 options: options.map(o => ({
                     word: o.word,
-                    translation: o.translation
+                    translation: o.translation,
+                    zh: o.zh,
+                    phonetic: o.phonetic
                 }))
             };
         });

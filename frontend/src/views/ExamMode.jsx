@@ -213,8 +213,13 @@ const ExamMode = () => {
             setIsPaused(true);
             setFeedback({
                 isCorrect,
-                correctTranslation: currentQ.correct_translation,
-                selectedWord: selectedOption ? selectedOption.translation : "Time's up!"
+                isAtomicOption: currentQ.isAtomic,
+                correctText: currentQ.correct_translation,
+                correctZh: currentQ.options.find(o => o.word === currentQ.target_word)?.zh, // For standard mode
+                correctPhonetic: currentQ.options.find(o => o.word === currentQ.target_word)?.phonetic,
+                selectedText: selectedOption ? selectedOption.translation : "Time's up!",
+                selectedZh: selectedOption ? selectedOption.zh : null,
+                selectedPhonetic: selectedOption ? selectedOption.phonetic : null
             });
 
             if (isCorrect) {
@@ -479,9 +484,25 @@ const ExamMode = () => {
                                     </div>
                                     <div className="p-4 bg-green-50 rounded-xl border border-green-100">
                                         <p className="text-[#8C7B70] text-sm uppercase tracking-widest mb-2 font-bold">Answer</p>
-                                        <p className="text-5xl font-bold text-[#2F5D62] font-serif">{feedback.correctTranslation}</p>
+                                        <p className="text-5xl font-bold text-[#2F5D62] font-serif">
+                                            {feedback.isAtomicOption ? (
+                                                feedback.correctText
+                                            ) : (
+                                                <>
+                                                    {feedback.correctZh || feedback.correctText}
+                                                    {feedback.correctPhonetic && <sup className="text-[0.6em] ml-1">{feedback.correctPhonetic}</sup>}
+                                                </>
+                                            )}
+                                        </p>
                                     </div>
-                                    <p className="text-[#8C7B70] text-xs mt-2">You selected: {feedback.selectedWord}</p>
+                                    <p className="text-[#8C7B70] text-xs mt-2">
+                                        You selected: {feedback.isAtomicOption ? feedback.selectedText : (
+                                            <>
+                                                {feedback.selectedZh || feedback.selectedText}
+                                                {feedback.selectedPhonetic && <sup className="text-[0.6em] ml-0.5">{feedback.selectedPhonetic}</sup>}
+                                            </>
+                                        )}
+                                    </p>
                                 </div>
                             )}
 
@@ -540,7 +561,14 @@ const ExamMode = () => {
                                             {idx + 1}
                                         </span>
                                         <span className="text-lg text-[#3D312A] group-hover:text-white font-medium">
-                                            {opt.translation}
+                                            {opt.isAtomicOption ? (
+                                                opt.translation
+                                            ) : (
+                                                <>
+                                                    {opt.zh || opt.translation}
+                                                    {opt.phonetic && <sup className="text-[0.6em] ml-1">{opt.phonetic}</sup>}
+                                                </>
+                                            )}
                                         </span>
                                     </div>
                                 </button>
