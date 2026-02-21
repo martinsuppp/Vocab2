@@ -102,9 +102,11 @@ const MemoryMode = () => {
             result = result.filter(w => StarManager.isStarred(w.word));
         }
         // 3. Chemistry Filter
-        if (settings.isChemistryMode) {
-            result = result.filter(w => w.phonetic && /^[+-]\d+$/.test(w.phonetic.trim()));
-        }
+        const isChemWord = (w) => w.phonetic && /^[+-]\d+$/.test(w.phonetic.trim());
+        result = result.filter(w => {
+            if (settings.isChemistryMode) return isChemWord(w);
+            return !isChemWord(w);
+        });
 
         setFilteredWords(result);
         setCurrentIndex(0);
