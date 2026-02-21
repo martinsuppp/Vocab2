@@ -566,7 +566,7 @@ const ExamMode = () => {
                                             ) : (
                                                 <>
                                                     {opt.zh || opt.translation}
-                                                    {opt.phonetic && <sup className="text-[0.6em] ml-1">{opt.phonetic}</sup>}
+                                                    {opt.phonetic && <sup className="text-[0.85em] ml-0.5 font-black font-sans">{opt.phonetic}</sup>}
                                                 </>
                                             )}
                                         </span>
