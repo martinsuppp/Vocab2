@@ -23,8 +23,7 @@ const ExamMode = () => {
         mistakeWeight,
         timePerQuestion,
         heartbeatEnabled, // [NEW]
-        ttsEnabled, // [NEW] TTS
-        isChemistryMode // [NEW] Chemistry Mode
+        ttsEnabled // [NEW] TTS
     } = settings;
 
     // [DEBUG] Check if setting is received
@@ -465,7 +464,7 @@ const ExamMode = () => {
                                 <div className="mb-6 space-y-4">
                                     <div className="p-4 bg-red-50 rounded-xl border border-red-100">
                                         <p className="text-[#8C7B70] text-sm uppercase tracking-widest mb-2 font-bold">
-                                            {isChemistryMode ? 'Element' : 'Question'}
+                                            Question
                                         </p>
                                         <p
                                             className="text-5xl font-bold text-[#3D312A] font-serif cursor-pointer hover:text-[#2F5D62] transition-colors active:scale-95"
@@ -477,11 +476,6 @@ const ExamMode = () => {
                                         >
                                             {questions[currentIndex].word} {ttsEnabled && '🔊'}
                                         </p>
-                                        {isChemistryMode && questions[currentIndex].phonetic && (
-                                            <p className="text-2xl font-bold text-[#D35D47] mt-2 font-mono">
-                                                {questions[currentIndex].phonetic}
-                                            </p>
-                                        )}
                                     </div>
                                     <div className="p-4 bg-green-50 rounded-xl border border-green-100">
                                         <p className="text-[#8C7B70] text-sm uppercase tracking-widest mb-2 font-bold">Answer</p>
@@ -527,11 +521,6 @@ const ExamMode = () => {
                                 QUESTION {currentIndex + 1} / {questions.length}
                             </span>
                             <h2 className="text-4xl font-bold text-[#3D312A] mb-2 font-serif">{questions[currentIndex]?.word}</h2>
-                            {isChemistryMode && questions[currentIndex]?.phonetic && (
-                                <p className="text-2xl font-bold text-[#2F5D62] mt-2 font-mono">
-                                    {questions[currentIndex]?.phonetic}
-                                </p>
-                            )}
                         </div>
 
                         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 bg-white">

@@ -60,12 +60,18 @@ const DataLoader = {
 
                     if (validRows.length === 0) continue;
 
-                    adaptedData[sheetName] = validRows.map(r => ({
-                        word: r.en,
-                        translation: r.zh,
-                        phonetic: r.phonetic,
-                        example: r.example
-                    }));
+                    adaptedData[sheetName] = validRows.map(r => {
+                        const zhStr = String(r.zh || '').trim();
+                        const phoneticStr = String(r.phonetic || '').trim();
+                        const combinedTranslation = phoneticStr ? `${zhStr} ${phoneticStr}` : zhStr;
+
+                        return {
+                            word: r.en,
+                            translation: combinedTranslation,
+                            phonetic: r.phonetic, // Kept for backward compatibility or future use
+                            example: r.example
+                        };
+                    });
                 }
                 cachedData = adaptedData;
                 return adaptedData;

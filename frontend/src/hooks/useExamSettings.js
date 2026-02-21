@@ -42,12 +42,6 @@ const useExamSettings = () => {
         return saved !== null ? saved === 'true' : false;
     });
 
-    // Chemistry Mode
-    const [isChemistryMode, setIsChemistryMode] = useState(() => {
-        const saved = localStorage.getItem('isChemistryMode');
-        return saved !== null ? saved === 'true' : false;
-    });
-
     // Persist settings whenever they change
     useEffect(() => {
         localStorage.setItem('numQuestions', numQuestions);
@@ -57,8 +51,7 @@ const useExamSettings = () => {
         localStorage.setItem('mistakeWeight', mistakeWeight);
         localStorage.setItem('heartbeatEnabled', heartbeatEnabled);
         localStorage.setItem('ttsEnabled', ttsEnabled);
-        localStorage.setItem('isChemistryMode', isChemistryMode);
-    }, [numQuestions, timePerQuestion, instantFeedback, newRatio, mistakeWeight, heartbeatEnabled, ttsEnabled, isChemistryMode]);
+    }, [numQuestions, timePerQuestion, instantFeedback, newRatio, mistakeWeight, heartbeatEnabled, ttsEnabled]);
 
     return {
         numQuestions, setNumQuestions,
@@ -67,8 +60,7 @@ const useExamSettings = () => {
         newRatio, setNewRatio,
         mistakeWeight, setMistakeWeight,
         heartbeatEnabled, setHeartbeatEnabled,
-        ttsEnabled, setTtsEnabled,
-        isChemistryMode, setIsChemistryMode
+        ttsEnabled, setTtsEnabled
     };
 };
 

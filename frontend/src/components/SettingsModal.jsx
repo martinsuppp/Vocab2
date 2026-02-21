@@ -10,14 +10,12 @@ const SettingsModal = ({ isOpen, onClose, settings }) => {
         instantFeedback, setInstantFeedback,
         newRatio, setNewRatio,
         mistakeWeight, setMistakeWeight,
-        ttsEnabled, setTtsEnabled,
-        isChemistryMode, setIsChemistryMode
+        ttsEnabled, setTtsEnabled
     } = settings;
 
     // Helper logic to simplify toggles inline
     const updateSetting = (key, value) => {
         if (key === 'ttsEnabled') setTtsEnabled(value);
-        if (key === 'isChemistryMode') setIsChemistryMode(value);
     };
 
     return (
@@ -187,22 +185,6 @@ const SettingsModal = ({ isOpen, onClose, settings }) => {
                             </label>
                         </div>
 
-                        {/* Chemistry Mode Toggle */}
-                        <div className="flex items-center justify-between p-4 bg-[#F9F7F5] rounded-xl border border-[#E0D6C8]">
-                            <div>
-                                <h3 className="font-bold text-[#3D312A] mb-1">🧪 Chemistry Mode</h3>
-                                <p className="text-sm text-[#8C7B70]">Display phonetic column as atomic number/key data.</p>
-                            </div>
-                            <label className="relative inline-flex items-center cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    className="sr-only peer"
-                                    checked={isChemistryMode}
-                                    onChange={(e) => updateSetting('isChemistryMode', e.target.checked)}
-                                />
-                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#F2A359]"></div>
-                            </label>
-                        </div>
                     </div>
                 </div>
 
