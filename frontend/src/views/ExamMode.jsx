@@ -94,7 +94,8 @@ const ExamMode = () => {
                     numQuestions,
                     newRatio,
                     mistakeWeight,
-                    starFilterActive: isStarFilterActive
+                    starFilterActive: isStarFilterActive,
+                    examFormat // [NEW] pass examFormat setting
                 });
                 setQuestions(data);
                 // Initial Question Timer
@@ -112,7 +113,7 @@ const ExamMode = () => {
             SoundManager.stopBGM();
             if (timerRef.current) clearInterval(timerRef.current);
         };
-    }, [filename, numQuestions, newRatio, mistakeWeight]);
+    }, [filename, numQuestions, newRatio, mistakeWeight, examFormat]); // added examFormat to deps
 
     useEffect(() => {
         if (!loading && questions.length > 0 && !isFinished && !isPaused && !isProcessing) {
