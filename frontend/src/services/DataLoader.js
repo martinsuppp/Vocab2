@@ -55,7 +55,7 @@ const DataLoader = {
                     const validRows = rows.filter(r => {
                         const en = String(r.en || '').trim();
                         const zh = String(r.zh || '').trim();
-                        return /[a-zA-Z]/.test(en) && zh.length > 0;
+                        return (/[a-zA-Z]/.test(en) || /[a-zA-Z]/.test(zh)) && en.length > 0 && zh.length > 0;
                     });
 
                     if (validRows.length === 0) continue;
