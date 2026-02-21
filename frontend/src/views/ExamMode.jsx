@@ -490,7 +490,7 @@ const ExamMode = () => {
                                             ) : (
                                                 <>
                                                     {feedback.correctZh || feedback.correctText}
-                                                    {feedback.correctPhonetic && <sup className="text-[0.6em] ml-1">{feedback.correctPhonetic}</sup>}
+                                                    {feedback.correctPhonetic && <sup className="text-[0.85em] ml-0.5 font-black font-sans">{feedback.correctPhonetic}</sup>}
                                                 </>
                                             )}
                                         </p>
