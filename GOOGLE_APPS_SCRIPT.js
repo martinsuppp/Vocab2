@@ -5,7 +5,7 @@ function doGet(e) {
     const result = {};
     sheets.forEach(sheet => {
         if (!sheet) return;
-        const data = sheet.getDataRange().getValues();
+        const data = sheet.getDataRange().getDisplayValues();
         const first = String(data[0]?.[0] || '').toLowerCase().trim();
         const skip = ['word', 'english', '英文', 'en'].includes(first);
         result[sheet.getName()] = (skip ? data.slice(1) : data)
