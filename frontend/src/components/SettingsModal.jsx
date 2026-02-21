@@ -9,8 +9,16 @@ const SettingsModal = ({ isOpen, onClose, settings }) => {
         timePerQuestion, setTimePerQuestion,
         instantFeedback, setInstantFeedback,
         newRatio, setNewRatio,
-        mistakeWeight, setMistakeWeight
+        mistakeWeight, setMistakeWeight,
+        ttsEnabled, setTtsEnabled,
+        isChemistryMode, setIsChemistryMode
     } = settings;
+
+    // Helper logic to simplify toggles inline
+    const updateSetting = (key, value) => {
+        if (key === 'ttsEnabled') setTtsEnabled(value);
+        if (key === 'isChemistryMode') setIsChemistryMode(value);
+    };
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
