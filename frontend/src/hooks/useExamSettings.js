@@ -48,6 +48,12 @@ const useExamSettings = () => {
         return saved ? saved : 'standard';
     });
 
+    // Master Chemistry Mode
+    const [isChemistryMode, setIsChemistryMode] = useState(() => {
+        const saved = localStorage.getItem('isChemistryMode');
+        return saved !== null ? saved === 'true' : false;
+    });
+
     // Persist settings whenever they change
     useEffect(() => {
         localStorage.setItem('numQuestions', numQuestions);
@@ -58,7 +64,8 @@ const useExamSettings = () => {
         localStorage.setItem('heartbeatEnabled', heartbeatEnabled);
         localStorage.setItem('ttsEnabled', ttsEnabled);
         localStorage.setItem('examFormat', examFormat);
-    }, [numQuestions, timePerQuestion, instantFeedback, newRatio, mistakeWeight, heartbeatEnabled, ttsEnabled, examFormat]);
+        localStorage.setItem('isChemistryMode', isChemistryMode);
+    }, [numQuestions, timePerQuestion, instantFeedback, newRatio, mistakeWeight, heartbeatEnabled, ttsEnabled, examFormat, isChemistryMode]);
 
     return {
         numQuestions, setNumQuestions,
@@ -68,7 +75,8 @@ const useExamSettings = () => {
         mistakeWeight, setMistakeWeight,
         heartbeatEnabled, setHeartbeatEnabled,
         ttsEnabled, setTtsEnabled,
-        examFormat, setExamFormat
+        examFormat, setExamFormat,
+        isChemistryMode, setIsChemistryMode
     };
 };
 

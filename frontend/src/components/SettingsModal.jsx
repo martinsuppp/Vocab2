@@ -10,7 +10,9 @@ const SettingsModal = ({ isOpen, onClose, settings }) => {
         instantFeedback, setInstantFeedback,
         newRatio, setNewRatio,
         mistakeWeight, setMistakeWeight,
-        ttsEnabled, setTtsEnabled
+        ttsEnabled, setTtsEnabled,
+        examFormat, setExamFormat,
+        isChemistryMode, setIsChemistryMode
     } = settings;
 
     // Helper logic to simplify toggles inline
@@ -63,6 +65,27 @@ const SettingsModal = ({ isOpen, onClose, settings }) => {
                                 ⚖️ Mixed (50/50)
                             </button>
                         </div>
+                    </div>
+
+                    {/* Master Chemistry Mode Toggle */}
+                    <div className="flex items-center justify-between p-4 bg-[#F2EBDE] rounded-xl border border-[#D6C2B0] shadow-sm">
+                        <div>
+                            <h3 className="font-bold text-[#3D312A] mb-1">🧪 Chemistry Mode</h3>
+                            <p className="text-xs text-[#8C7B70]">Filter elements to only show numeric ions. Disables TTS.</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                className="sr-only peer"
+                                checked={isChemistryMode}
+                                onChange={(e) => {
+                                    setIsChemistryMode(e.target.checked);
+                                    if (e.target.checked) updateSetting('ttsEnabled', false); // Force TTS off
+                                    if (!e.target.checked) setExamFormat('standard'); // Revert to standard if disabled
+                                }}
+                            />
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#2F5D62]"></div>
+                        </label>
                     </div>
 
                     {/* Instant Feedback Toggle */}
@@ -118,12 +141,16 @@ const SettingsModal = ({ isOpen, onClose, settings }) => {
                         </div>
 
                         {/* Exam Format Mode */}
-                        <div className="flex flex-col gap-1 p-4 bg-[#F9F7F5] rounded-xl border border-[#E0D6C8]">
-                            <h3 className="font-bold text-[#3D312A] mb-1">📝 Exam Format</h3>
+                        <div className={`flex flex-col gap-1 p-4 rounded-xl border transition-colors ${!isChemistryMode ? 'bg-gray-50 border-gray-200 opacity-60' : 'bg-[#F9F7F5] border-[#E0D6C8]'}`}>
+                            <div className="flex justify-between items-start mb-1">
+                                <h3 className="font-bold text-[#3D312A]">📝 Exam Format</h3>
+                                {!isChemistryMode && <span className="text-[10px] text-red-500 font-bold uppercase tracking-wider bg-red-50 px-2 py-0.5 rounded">Locked</span>}
+                            </div>
                             <select
-                                value={settings.examFormat || 'standard'}
-                                onChange={(e) => settings.setExamFormat(e.target.value)}
-                                className="w-full p-2 rounded-lg bg-white border border-[#E0D6C8] text-[#5C4B41] focus:outline-none focus:border-[#2F5D62]"
+                                value={isChemistryMode ? (settings.examFormat || 'standard') : 'standard'}
+                                onChange={(e) => isChemistryMode && settings.setExamFormat(e.target.value)}
+                                disabled={!isChemistryMode}
+                                className="w-full p-2 rounded-lg bg-white border border-[#E0D6C8] text-[#5C4B41] focus:outline-none focus:border-[#2F5D62] disabled:cursor-not-allowed disabled:bg-gray-100"
                             >
                                 <option value="standard">Standard (Word → Translation)</option>
                                 <option value="atomic">Atomic (Word+Translation → Phonetic)</option>
@@ -183,17 +210,19 @@ const SettingsModal = ({ isOpen, onClose, settings }) => {
                         </div>
 
                         {/* TTS Toggle */}
-                        <div className="flex items-center justify-between p-4 bg-[#F9F7F5] rounded-xl border border-[#E0D6C8]">
+                        <div className={`flex items-center justify-between p-4 rounded-xl border transition-colors ${isChemistryMode ? 'bg-gray-50 border-gray-200 opacity-60' : 'bg-[#F9F7F5] border-[#E0D6C8]'}`}>
                             <div>
                                 <h3 className="font-bold text-[#3D312A] mb-1">🗣️ English Voice (TTS)</h3>
                                 <p className="text-sm text-[#8C7B70]">Read English words aloud.</p>
+                                {isChemistryMode && <span className="text-[10px] text-red-500 font-bold uppercase tracking-wider block mt-1">Disabled in Chem Mode</span>}
                             </div>
-                            <label className="relative inline-flex items-center cursor-pointer">
+                            <label className={`relative inline-flex items-center ${isChemistryMode ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
                                 <input
                                     type="checkbox"
                                     className="sr-only peer"
-                                    checked={ttsEnabled}
-                                    onChange={(e) => updateSetting('ttsEnabled', e.target.checked)}
+                                    checked={!isChemistryMode && ttsEnabled}
+                                    disabled={isChemistryMode}
+                                    onChange={(e) => !isChemistryMode && updateSetting('ttsEnabled', e.target.checked)}
                                 />
                                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#2F5D62]"></div>
                             </label>

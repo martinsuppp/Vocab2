@@ -43,6 +43,11 @@ export const generateExam = async (filename, settings) => {
         allWords = allWords.filter(w => StarManager.isStarred(w.word));
     }
 
+    // 2.5 Filter for Chemistry Mode (only words with numeric ion phonetics)
+    if (settings && settings.isChemistryMode) {
+        allWords = allWords.filter(w => w.phonetic && /^[+-]\d+$/.test(w.phonetic.trim()));
+    }
+
     // 3. Generate exam locally
     return MistakeTracker.generateExam(allWords, settings);
 };

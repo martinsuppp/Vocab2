@@ -118,11 +118,15 @@ const MemoryMode = () => {
         if (starFilterActive) {
             result = result.filter(w => StarManager.isStarred(w.word));
         }
+        // 3. Chemistry Filter
+        if (settings.isChemistryMode) {
+            result = result.filter(w => w.phonetic && /^[+-]\d+$/.test(w.phonetic.trim()));
+        }
 
         setFilteredWords(result);
         setCurrentIndex(0);
         setIsFlipped(false);
-    }, [weakFilter, starFilterActive, words]);
+    }, [weakFilter, starFilterActive, settings.isChemistryMode, words]);
 
     const handleToggleStar = (e, word) => {
         e.stopPropagation();

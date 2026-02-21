@@ -132,14 +132,28 @@ const ListMode = () => {
     };
 
     const toggleAll = () => {
-        if (selectedSheets.length === sheetNames.length) {
+        // If in chemistry mode, 'all' should only toggle the valid sheets
+        let validSheets = sheetNames;
+        if (settings.isChemistryMode) {
+            validSheets = sheetNames.filter(sheet => {
+                const words = allData[sheet] || [];
+                return words.some(w => w.phonetic && /^[+-]\d+$/.test(w.phonetic.trim()));
+            });
+        }
+
+        // We consider 'all selected' if every valid sheet is in selectedSheets
+        const allSelected = validSheets.every(s => selectedSheets.includes(s));
+
+        if (allSelected) {
             setSelectedSheets([]);
         } else {
-            setSelectedSheets(sheetNames);
+            setSelectedSheets([...new Set([...selectedSheets, ...validSheets])]);
         }
     };
 
-    const filteredWords = getFilteredWords();
+    const isChemWord = (w) => w.phonetic && /^[+-]\d+$/.test(w.phonetic.trim());
+
+    const filteredWords = getFilteredWords().filter(w => !settings.isChemistryMode || isChemWord(w));
 
     if (loading) {
         return (
@@ -195,7 +209,19 @@ const ListMode = () => {
                         </button>
 
                         {sheetNames.map(sheet => {
-                            const count = allData[sheet]?.length || 0;
+                            const words = allData[sheet] || [];
+
+                            // Let's see how many valid words this sheet actually has
+                            let validWords = words;
+                            if (settings.isChemistryMode) {
+                                validWords = words.filter(w => isChemWord(w));
+                            }
+
+                            const count = validWords.length;
+
+                            // Skip rendering this button if chemistry mode is active and count is 0
+                            if (settings.isChemistryMode && count === 0) return null;
+
                             const isSelected = selectedSheets.includes(sheet);
                             return (
                                 <button
