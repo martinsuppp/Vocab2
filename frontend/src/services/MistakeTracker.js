@@ -220,18 +220,19 @@ const MistakeTracker = {
             }
 
             // Standard Generation Fallback
-            const distractors = allWords.filter(w => w.word !== target.word);
             let options = [target];
+            // Find distractors excluding the target itself
+            let distractors = allWords.filter(w => w.word !== target.word);
 
-            if (distractors.length >= 3) {
-                // Shuffle distractors and pick 3
+            // If we don't have enough distractors in the filtered pool, we just use what we have
+            if (distractors.length > 0) {
+                // Shuffle distractors
                 const shuffled = [...distractors].sort(() => 0.5 - Math.random());
+                // Pick up to 3
                 options = options.concat(shuffled.slice(0, 3));
-            } else {
-                options = options.concat(distractors);
             }
 
-            // Shuffle options
+            // Shuffle final options
             options.sort(() => 0.5 - Math.random());
 
             return {
