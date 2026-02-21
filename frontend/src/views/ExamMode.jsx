@@ -24,7 +24,8 @@ const ExamMode = () => {
         timePerQuestion,
         heartbeatEnabled, // [NEW]
         ttsEnabled, // [NEW] TTS
-        examFormat
+        examFormat,
+        isChemistryMode // [FIX] Add to destructuring
     } = settings;
 
     // [DEBUG] Check if setting is received
