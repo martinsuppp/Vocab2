@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { getWords } from '../api.js';
 import MistakeTracker from '../services/MistakeTracker';
-import { ArrowLeft, ArrowRight, RotateCw, Eye, Filter, Star } from 'lucide-react';
+import { ArrowLeft, ArrowRight, RotateCw, Eye, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import SoundManager from '../utils/SoundManager';
 import LearningLayout from '../components/LearningLayout';
@@ -53,7 +53,6 @@ const MemoryMode = () => {
     const [isFlipped, setIsFlipped] = useState(false);
     const [loading, setLoading] = useState(true);
     const [autoReveal, setAutoReveal] = useState(false);
-    const [weakFilter, setWeakFilter] = useState(0);
 
     // Settings for TTS
     const settings = useExamSettings();
@@ -98,23 +97,7 @@ const MemoryMode = () => {
 
         let result = [...words];
 
-        // 1. Weak Filter
-        if (weakFilter > 0) {
-            const wordList = result.map(w => w.word);
-            const stats = MistakeTracker.getStats(wordList);
-
-            result = result.filter(w => {
-                const s = stats[w.word];
-                if (!s) return false;
-                const total = s.correct_count + s.mistake_count;
-                if (total === 0) return false;
-
-                const errorRate = (s.mistake_count / total) * 100;
-                return errorRate >= weakFilter;
-            });
-        }
-
-        // 2. Star Filter
+        // 1. Star Filter
         if (starFilterActive) {
             result = result.filter(w => StarManager.isStarred(w.word));
         }
@@ -126,7 +109,7 @@ const MemoryMode = () => {
         setFilteredWords(result);
         setCurrentIndex(0);
         setIsFlipped(false);
-    }, [weakFilter, starFilterActive, settings.isChemistryMode, words]);
+    }, [starFilterActive, settings.isChemistryMode, words]);
 
     const handleToggleStar = (e, word) => {
         e.stopPropagation();
@@ -198,14 +181,6 @@ const MemoryMode = () => {
             <LearningLayout>
                 <div className="h-full flex flex-col items-center justify-center text-[#5C4B41] gap-4">
                     <p>No words found matching criteria.</p>
-                    {weakFilter > 0 && (
-                        <button
-                            onClick={() => setWeakFilter(0)}
-                            className="bg-[#2F5D62] text-white px-4 py-2 rounded-lg"
-                        >
-                            Reset Filter (Show All)
-                        </button>
-                    )}
                 </div>
             </LearningLayout>
         );
@@ -222,26 +197,31 @@ const MemoryMode = () => {
                     </div>
 
                     <div className="flex items-center gap-2">
-                        {/* Weak Filter Dropdown */}
-                        <div className="relative group">
-                            <button className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium transition-colors border ${weakFilter > 0
-                                ? 'bg-[#D35D47] text-white border-[#D35D47]'
+                        {/* Star Filter Toggle */}
+                        <button
+                            onClick={() => {
+                                const newValue = !starFilterActive;
+                                setStarFilterActive(newValue);
+                                // Save to session
+                                const sessionRaw = localStorage.getItem('currentSession');
+                                if (sessionRaw) {
+                                    try {
+                                        const session = JSON.parse(sessionRaw);
+                                        session.starFilterActive = newValue;
+                                        localStorage.setItem('currentSession', JSON.stringify(session));
+                                    } catch (e) {
+                                        console.error("Error saving star filter to session", e);
+                                    }
+                                }
+                            }}
+                            className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium transition-colors border ${starFilterActive
+                                ? 'bg-[#F2A359] text-white border-[#F2A359]'
                                 : 'bg-white text-[#8C7B70] border-[#E0D6C8] hover:bg-[#F0EBE0]'
-                                }`}>
-                                <Filter className="w-3 h-3" />
-                                {weakFilter === 0 ? 'All Words' : `> ${weakFilter}% Error`}
-                            </button>
-
-                            {/* Dropdown Menu */}
-                            <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-[#E0D6C8] overflow-hidden z-10 hidden group-hover:block hover:block">
-                                <div className="p-1">
-                                    <button onClick={() => setWeakFilter(0)} className="w-full text-left px-4 py-2 text-sm hover:bg-[#F5F1E8] rounded-lg">All Words</button>
-                                    <button onClick={() => setWeakFilter(25)} className="w-full text-left px-4 py-2 text-sm hover:bg-[#F5F1E8] rounded-lg text-[#D35D47]">Weak (&gt; 25% Error)</button>
-                                    <button onClick={() => setWeakFilter(50)} className="w-full text-left px-4 py-2 text-sm hover:bg-[#F5F1E8] rounded-lg text-[#D35D47]">Very Weak (&gt; 50%)</button>
-                                    <button onClick={() => setWeakFilter(75)} className="w-full text-left px-4 py-2 text-sm hover:bg-[#F5F1E8] rounded-lg text-[#D35D47]">Critical (&gt; 75%)</button>
-                                </div>
-                            </div>
-                        </div>
+                                }`}
+                        >
+                            <Star className={`w-3 h-3 ${starFilterActive ? 'fill-white' : ''}`} />
+                            {starFilterActive ? 'Starred Only' : 'All Words'}
+                        </button>
 
                         <button
                             onClick={() => setAutoReveal(!autoReveal)}
