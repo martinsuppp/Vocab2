@@ -23,7 +23,8 @@ const ExamMode = () => {
         mistakeWeight,
         timePerQuestion,
         heartbeatEnabled, // [NEW]
-        ttsEnabled // [NEW] TTS
+        ttsEnabled, // [NEW] TTS
+        examFormat
     } = settings;
 
     // [DEBUG] Check if setting is received
