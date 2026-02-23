@@ -12,7 +12,8 @@ const SettingsModal = ({ isOpen, onClose, settings }) => {
         mistakeWeight, setMistakeWeight,
         ttsEnabled, setTtsEnabled,
         examFormat, setExamFormat,
-        isChemistryMode, setIsChemistryMode
+        isChemistryMode, setIsChemistryMode,
+        examDirection, setExamDirection
     } = settings;
 
     // Helper logic to simplify toggles inline
