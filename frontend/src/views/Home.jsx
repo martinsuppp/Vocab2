@@ -94,7 +94,8 @@ const Home = () => {
         instantFeedback,
         newRatio,
         mistakeWeight,
-        timePerQuestion
+        timePerQuestion,
+        examDirection // [FIX] Added to destructuring
     } = settings;
 
     const [showSettings, setShowSettings] = useState(false);
@@ -122,7 +123,8 @@ const Home = () => {
                 instantFeedback,
                 newRatio,
                 mistakeWeight,
-                timePerQuestion
+                timePerQuestion,
+                examDirection // [FIX] Passed to session settings
             }
         };
         localStorage.setItem('currentSession', JSON.stringify(sessionConfig));
