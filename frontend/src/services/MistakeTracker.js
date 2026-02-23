@@ -248,6 +248,7 @@ const MistakeTracker = {
                     target_word: target.word,
                     word: target.translation, // Prompt is Chinese
                     correct_translation: target.word, // Answer is English
+                    example: target.example, // [FIX] Forward example sentence
                     options: options.map(o => ({
                         word: o.translation,
                         translation: o.word, // Option text is English
@@ -263,6 +264,7 @@ const MistakeTracker = {
                 target_word: target.word,
                 word: target.word,
                 correct_translation: target.translation,
+                example: target.example, // [FIX] Forward example sentence
                 options: options.map(o => ({
                     word: o.word,
                     translation: o.translation,
