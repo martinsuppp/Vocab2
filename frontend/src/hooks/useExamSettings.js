@@ -55,10 +55,15 @@ const useExamSettings = () => {
     });
 
     // Translation Direction
-    const [examDirection, setExamDirection] = useState(() => {
+    const [examDirection, setExamDirectionState] = useState(() => {
         const saved = localStorage.getItem('examDirection');
         return saved ? saved : 'en-zh';
     });
+
+    const setExamDirection = (val) => {
+        setExamDirectionState(val);
+        localStorage.setItem('examDirection', val);
+    };
 
     // Persist settings whenever they change
     useEffect(() => {
