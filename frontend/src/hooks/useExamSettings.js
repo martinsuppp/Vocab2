@@ -54,6 +54,12 @@ const useExamSettings = () => {
         return saved !== null ? saved === 'true' : false;
     });
 
+    // Translation Direction
+    const [examDirection, setExamDirection] = useState(() => {
+        const saved = localStorage.getItem('examDirection');
+        return saved ? saved : 'en-zh';
+    });
+
     // Persist settings whenever they change
     useEffect(() => {
         localStorage.setItem('numQuestions', numQuestions);
@@ -65,7 +71,8 @@ const useExamSettings = () => {
         localStorage.setItem('ttsEnabled', ttsEnabled);
         localStorage.setItem('examFormat', examFormat);
         localStorage.setItem('isChemistryMode', isChemistryMode);
-    }, [numQuestions, timePerQuestion, instantFeedback, newRatio, mistakeWeight, heartbeatEnabled, ttsEnabled, examFormat, isChemistryMode]);
+        localStorage.setItem('examDirection', examDirection);
+    }, [numQuestions, timePerQuestion, instantFeedback, newRatio, mistakeWeight, heartbeatEnabled, ttsEnabled, examFormat, isChemistryMode, examDirection]);
 
     return {
         numQuestions, setNumQuestions,

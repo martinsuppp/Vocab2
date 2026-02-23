@@ -235,8 +235,31 @@ const MistakeTracker = {
             // Shuffle final options
             options.sort(() => 0.5 - Math.random());
 
+            // Determine Direction for this specific question
+            let direction = settings.examDirection || 'en-zh';
+            if (direction === 'mixed') {
+                direction = Math.random() > 0.5 ? 'en-zh' : 'zh-en';
+            }
+
+            if (direction === 'zh-en') {
+                return {
+                    isAtomic: false,
+                    isReversed: true, // Flag for UI (e.g. disable TTS on prompt)
+                    target_word: target.word,
+                    word: target.translation, // Prompt is Chinese
+                    correct_translation: target.word, // Answer is English
+                    options: options.map(o => ({
+                        word: o.translation,
+                        translation: o.word, // Option text is English
+                        zh: o.word,          // Fallback UI text is English
+                        phonetic: null       // Hide phonetic when options are English
+                    }))
+                };
+            }
+
             return {
                 isAtomic: false,
+                isReversed: false,
                 target_word: target.word,
                 word: target.word,
                 correct_translation: target.translation,

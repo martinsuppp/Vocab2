@@ -76,6 +76,24 @@ const SettingsModal = ({ isOpen, onClose, settings }) => {
                                 <option value="mixed">Mixed (Randomly toggled)</option>
                             </select>
                         </div>
+
+                        {/* Testing Direction Context */}
+                        <div className={`flex flex-col gap-1 p-4 rounded-xl border transition-colors ${isChemistryMode ? 'bg-gray-50 border-gray-200 opacity-60' : 'bg-[#F9F7F5] border-[#E0D6C8]'}`}>
+                            <div className="flex justify-between items-start mb-1">
+                                <h3 className="font-bold text-[#3D312A]">↔️ Testing Direction</h3>
+                                {isChemistryMode && <span className="text-[10px] text-red-500 font-bold uppercase tracking-wider bg-red-50 px-2 py-0.5 rounded">Locked</span>}
+                            </div>
+                            <select
+                                value={!isChemistryMode ? (settings.examDirection || 'en-zh') : 'en-zh'}
+                                onChange={(e) => !isChemistryMode && settings.setExamDirection(e.target.value)}
+                                disabled={isChemistryMode}
+                                className="w-full p-2 rounded-lg bg-white border border-[#E0D6C8] text-[#5C4B41] focus:outline-none focus:border-[#2F5D62] disabled:cursor-not-allowed disabled:bg-gray-100"
+                            >
+                                <option value="en-zh">English → Chinese (Default)</option>
+                                <option value="zh-en">Chinese → English</option>
+                                <option value="mixed">Mixed (Randomized)</option>
+                            </select>
+                        </div>
                     </div>
 
                     <hr className="border-[#F0EBE0]" />

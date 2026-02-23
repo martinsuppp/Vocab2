@@ -479,14 +479,14 @@ const ExamMode = () => {
                                             Question
                                         </p>
                                         <p
-                                            className="text-5xl font-bold text-[#3D312A] font-serif cursor-pointer hover:text-[#2F5D62] transition-colors active:scale-95"
+                                            className={`text-5xl font-bold text-[#3D312A] font-serif transition-colors ${!questions[currentIndex].isReversed && ttsEnabled ? 'cursor-pointer hover:text-[#2F5D62] active:scale-95' : ''}`}
                                             onClick={(e) => {
                                                 e.stopPropagation(); // Prevent dismissing the overlay
-                                                if (ttsEnabled) SoundManager.speak(questions[currentIndex].word);
+                                                if (ttsEnabled && !questions[currentIndex].isReversed) SoundManager.speak(questions[currentIndex].word);
                                             }}
-                                            title={ttsEnabled ? "Click to hear pronunciation" : ""}
+                                            title={ttsEnabled && !questions[currentIndex].isReversed ? "Click to hear pronunciation" : ""}
                                         >
-                                            {questions[currentIndex].word} {ttsEnabled && '🔊'}
+                                            {questions[currentIndex].word} {ttsEnabled && !questions[currentIndex].isReversed && '🔊'}
                                         </p>
                                     </div>
                                     <div className="p-4 bg-green-50 rounded-xl border border-green-100">

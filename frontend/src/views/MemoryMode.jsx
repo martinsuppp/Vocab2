@@ -95,7 +95,16 @@ const MemoryMode = () => {
     useEffect(() => {
         if (words.length === 0) return;
 
-        let result = [...words];
+        let result = words.map(w => {
+            let direction = settings.examDirection || 'en-zh';
+            if (direction === 'mixed') {
+                direction = Math.random() > 0.5 ? 'en-zh' : 'zh-en';
+            }
+            return {
+                ...w,
+                displayDirection: direction
+            };
+        });
 
         // 1. Star Filter
         if (starFilterActive) {
@@ -109,7 +118,7 @@ const MemoryMode = () => {
         setFilteredWords(result);
         setCurrentIndex(0);
         setIsFlipped(false);
-    }, [starFilterActive, settings.isChemistryMode, words]);
+    }, [starFilterActive, settings.isChemistryMode, settings.examDirection, words]);
 
     const handleToggleStar = (e, word) => {
         e.stopPropagation();
@@ -165,6 +174,26 @@ const MemoryMode = () => {
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [currentIndex, isFlipped, filteredWords.length]);
+
+    // Auto TTS on Reveal
+    useEffect(() => {
+        if (!settings.ttsEnabled || filteredWords.length === 0) return;
+
+        const currentWord = filteredWords[currentIndex];
+
+        // Determine if English side is visible
+        const isEnglishVisible =
+            (currentWord.displayDirection === 'en-zh' && !isFlipped) ||
+            (currentWord.displayDirection === 'zh-en' && isFlipped);
+
+        if (isEnglishVisible) {
+            // Small delay to let the animation start / keep it from feeling too rigid
+            const timer = setTimeout(() => {
+                SoundManager.speak(currentWord.word);
+            }, 300);
+            return () => clearTimeout(timer);
+        }
+    }, [currentIndex, isFlipped, filteredWords, settings.ttsEnabled]);
 
     if (loading) {
         return (
@@ -248,57 +277,80 @@ const MemoryMode = () => {
                         className="w-full h-full relative preserve-3d"
                         style={{ transformStyle: 'preserve-3d' }}
                     >
-                        {/* Front (English) */}
+                        {/* Front (Primary Prompt) */}
                         <div className="absolute inset-0 backface-hidden bg-white rounded-3xl shadow-xl flex flex-col items-center justify-center border border-[#E0D6C8] group-hover:border-[#BFAF9E] transition-colors">
                             <span className="text-xs font-bold text-[#8C7B70] uppercase tracking-widest absolute top-8">
-                                Term
+                                {currentWord.displayDirection === 'zh-en' ? 'Definition' : 'Term'}
                             </span>
 
                             {/* Star Toggle Button */}
                             <button
                                 onClick={(e) => handleToggleStar(e, currentWord.word)}
-                                className="absolute top-6 right-6 p-2 text-[#D6C2B0] hover:text-[#F2A359] transition-colors z-10"
+                                className="absolute top-6 right-6 p-2 text-[#D6C2B0] hover:text-[#F2A359] transition-colors z-10 focus:outline-none"
                                 title="Toggle Star"
                             >
                                 <Star className={`w-6 h-6 ${StarManager.isStarred(currentWord.word) ? 'fill-[#F2A359] text-[#F2A359]' : ''}`} />
                             </button>
 
-                            <h2 className="text-5xl font-bold text-[#3D312A] text-center px-4 break-words font-serif">
-                                {currentWord.word}
-                            </h2>
+                            {currentWord.displayDirection === 'zh-en' ? (
+                                <>
+                                    <h2 className="text-4xl md:text-5xl font-bold text-[#3D312A] text-center px-4 break-words leading-relaxed font-serif">
+                                        {currentWord.zh || currentWord.translation}
+                                        {currentWord.phonetic && <sup className="text-[0.85em] ml-0.5 font-black text-[#8C7B70] font-sans">{currentWord.phonetic}</sup>}
+                                    </h2>
+                                    {currentWord.example && (
+                                        <p className="mt-8 px-8 text-center text-[#8C7B70] text-sm md:text-base italic leading-relaxed font-serif max-w-sm">
+                                            "{currentWord.example}"
+                                        </p>
+                                    )}
+                                </>
+                            ) : (
+                                <h2 className="text-5xl font-bold text-[#3D312A] text-center px-4 break-words font-serif">
+                                    {currentWord.word}
+                                    {settings.ttsEnabled && <volume2 className="w-6 h-6 inline-block ml-4 text-[#8C7B70] opacity-50 cursor-pointer hover:opacity-100 transition-opacity" onClick={(e) => { e.stopPropagation(); SoundManager.speak(currentWord.word); }} />}
+                                </h2>
+                            )}
 
                             <p className="absolute bottom-8 text-[#8C7B70] text-sm flex items-center gap-2">
                                 <RotateCw className="w-4 h-4" /> Tap to flip
                             </p>
                         </div>
 
-                        {/* Back (Translation) */}
+                        {/* Back (Secondary Answer) */}
                         <div
                             className="absolute inset-0 backface-hidden bg-[#2F5D62] rounded-3xl shadow-xl flex flex-col items-center justify-center border border-[#244A4E]"
                             style={{ transform: 'rotateY(180deg)' }}
                         >
                             <span className="text-xs font-bold text-[#D6C2B0] uppercase tracking-widest absolute top-8">
-                                Definition
+                                {currentWord.displayDirection === 'zh-en' ? 'Term' : 'Definition'}
                             </span>
 
                             {/* Star Toggle Button */}
                             <button
                                 onClick={(e) => handleToggleStar(e, currentWord.word)}
-                                className="absolute top-6 right-6 p-2 text-[#D6C2B0] hover:text-[#F2A359] transition-colors z-10"
+                                className="absolute top-6 right-6 p-2 text-[#D6C2B0] hover:text-[#F2A359] transition-colors z-10 focus:outline-none"
                                 title="Toggle Star"
                             >
                                 <Star className={`w-6 h-6 ${StarManager.isStarred(currentWord.word) ? 'fill-[#F2A359] text-[#F2A359]' : ''}`} />
                             </button>
 
-                            <h2 className="text-4xl font-bold text-[#F5F1E8] text-center px-4 break-words leading-relaxed font-serif">
-                                {currentWord.zh || currentWord.translation}
-                                {currentWord.phonetic && <sup className="text-[0.85em] ml-0.5 font-black text-[#F2A359] font-sans">{currentWord.phonetic}</sup>}
-                            </h2>
-
-                            {currentWord.example && (
-                                <p className="mt-8 px-8 text-center text-[#D6C2B0] text-sm md:text-base italic leading-relaxed font-serif max-w-sm">
-                                    "{currentWord.example}"
-                                </p>
+                            {currentWord.displayDirection === 'zh-en' ? (
+                                <h2 className="text-5xl font-bold text-[#F5F1E8] text-center px-4 break-words font-serif">
+                                    {currentWord.word}
+                                    {settings.ttsEnabled && <volume2 className="w-6 h-6 inline-block ml-4 text-[#D6C2B0] opacity-50 cursor-pointer hover:opacity-100 transition-opacity" onClick={(e) => { e.stopPropagation(); SoundManager.speak(currentWord.word); }} />}
+                                </h2>
+                            ) : (
+                                <>
+                                    <h2 className="text-4xl md:text-5xl font-bold text-[#F5F1E8] text-center px-4 break-words leading-relaxed font-serif">
+                                        {currentWord.zh || currentWord.translation}
+                                        {currentWord.phonetic && <sup className="text-[0.85em] ml-0.5 font-black text-[#F2A359] font-sans">{currentWord.phonetic}</sup>}
+                                    </h2>
+                                    {currentWord.example && (
+                                        <p className="mt-8 px-8 text-center text-[#D6C2B0] text-sm md:text-base italic leading-relaxed font-serif max-w-sm">
+                                            "{currentWord.example}"
+                                        </p>
+                                    )}
+                                </>
                             )}
                         </div>
                     </motion.div>
