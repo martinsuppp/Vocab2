@@ -88,7 +88,8 @@ const useExamSettings = () => {
         heartbeatEnabled, setHeartbeatEnabled,
         ttsEnabled, setTtsEnabled,
         examFormat, setExamFormat,
-        isChemistryMode, setIsChemistryMode
+        isChemistryMode, setIsChemistryMode,
+        examDirection, setExamDirection
     };
 };
 
