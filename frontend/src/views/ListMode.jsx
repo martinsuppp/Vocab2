@@ -283,6 +283,11 @@ const ListMode = () => {
                                     {item.zh}
                                     {item.phonetic && <sup className="text-[0.85em] ml-0.5 font-black text-[#2C241F] font-sans">{item.phonetic}</sup>}
                                 </p>
+                                {item.example && (
+                                    <p className="mt-2 text-xs italic text-[#8C7B70] leading-relaxed border-t border-dashed border-[#F0EBE0] pt-2">
+                                        {item.example}
+                                    </p>
+                                )}
                             </div>
                         </div>
                     ))}

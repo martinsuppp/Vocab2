@@ -223,6 +223,7 @@ const ExamMode = () => {
                 correctText: currentQ.correct_translation,
                 correctZh: currentQ.options.find(o => o.word === currentQ.target_word)?.zh, // For standard mode
                 correctPhonetic: currentQ.options.find(o => o.word === currentQ.target_word)?.phonetic,
+                correctExample: currentQ.options.find(o => o.word === currentQ.target_word)?.example,
                 selectedText: selectedOption ? selectedOption.translation : "Time's up!",
                 selectedZh: selectedOption ? selectedOption.zh : null,
                 selectedPhonetic: selectedOption ? selectedOption.phonetic : null
@@ -500,6 +501,11 @@ const ExamMode = () => {
                                                 </>
                                             )}
                                         </p>
+                                        {feedback.correctExample && (
+                                            <p className="mt-3 pt-3 border-t border-dashed border-green-200 text-sm text-[#244A4E] italic font-serif leading-relaxed">
+                                                "{feedback.correctExample}"
+                                            </p>
+                                        )}
                                     </div>
                                     <p className="text-[#8C7B70] text-xs mt-2">
                                         You selected: {feedback.isAtomicOption ? feedback.selectedText : (

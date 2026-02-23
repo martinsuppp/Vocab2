@@ -294,6 +294,12 @@ const MemoryMode = () => {
                                 {currentWord.zh || currentWord.translation}
                                 {currentWord.phonetic && <sup className="text-[0.85em] ml-0.5 font-black text-[#F2A359] font-sans">{currentWord.phonetic}</sup>}
                             </h2>
+
+                            {currentWord.example && (
+                                <p className="mt-8 px-8 text-center text-[#D6C2B0] text-sm md:text-base italic leading-relaxed font-serif max-w-sm">
+                                    "{currentWord.example}"
+                                </p>
+                            )}
                         </div>
                     </motion.div>
                 </div>
